@@ -5,7 +5,7 @@ simplement lus à la console!
 */
 
 // Votre version sera dans Participants.<VosNoms>
-package Participants.Console;
+package Participants.FroidevauxKaluznyNeuhaus;
 
 // Pour l'interopérabilité: il faut une représentation commune des coups!
 import Othello.Move;

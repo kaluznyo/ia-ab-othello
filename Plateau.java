@@ -62,145 +62,156 @@ public class Plateau
 		return 0;
 		}
 
-	public void miseAJourGrille(Move coup)
+	public void miseAJourGrille(Move coup1)
 		{
+		Move coup = new Move(coup1.j, coup1.i);
 		int i = coup.i;
 		int j = coup.j;
-
+		System.out.println("Pos Coup = (" + i + "," + j + ")");
 		grille[i][j] = this.joueurActif;
 
 		//Traitement vertical (Bas)
 		j++;
-		while(grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif && j < 8 && j >= 0)
+		while(j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
 			{
+			System.out.println("Test" + j);
 			j++;
 			}
 
-		if(grille[i][j] == this.joueurActif)
+		if (j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
 			{
 			for(int j2 = coup.j; j2 < j; j2++)
 				{
 				grille[i][j2] = this.joueurActif;
+				System.out.println("VB> (" + i + "," + j2 + ")");
 				}
 			}
 
 		//Traitement vertical (Haut)
-		j = coup.j-1;
-		while(grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif && j < 8 && j >= 0)
+		j = coup.j - 1;
+		while(j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
 			{
 			j--;
 			}
 
-		if(grille[i][j] == this.joueurActif)
+		if (j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
 			{
 			for(int j2 = coup.j; j2 > j; j2--)
 				{
 				grille[i][j2] = this.joueurActif;
+				System.out.println("VH> (" + i + "," + j2 + ")");
 				}
 			}
 
 		//Traitement horizontal (Gauche)
-		i = coup.i-1;
-		while(grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif && i < 8 && i >= 0)
+		j = coup.j;
+		i = coup.i - 1;
+		while(i < 8 && i >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
 			{
 			i--;
 			}
 
-		if(grille[i][j] == this.joueurActif)
+		if (i < 8 && i >= 0 && grille[i][j] == this.joueurActif)
 			{
 			for(int i2 = coup.i; i2 > i; i2--)
 				{
 				grille[i2][j] = this.joueurActif;
+				System.out.println("HG> (" + i2 + "," + j + ")");
 				}
 			}
 
 		//Traitement horizontal (Droite)
-		i = coup.i+1;
-		while(grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif && i < 8 && i >= 0)
+		i = coup.i + 1;
+		while(i < 8 && i >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
 			{
 			i++;
 			}
 
-		if(grille[i][j] == this.joueurActif)
+		if (i < 8 && i >= 0 && grille[i][j] == this.joueurActif)
 			{
 			for(int i2 = coup.i; i2 < i; i2++)
 				{
 				grille[i2][j] = this.joueurActif;
+				System.out.println("HD> (" + i2 + "," + j + ")");
 				}
 			}
 
 		//Traitement Diagonal (Bas,Droite)
-		i = coup.i+1;
-		j = coup.j+1;
-		while(grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif && i < 8 && i >= 0 && j < 8 && j >= 0)
+		i = coup.i + 1;
+		j = coup.j + 1;
+		while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
 			{
 			i++;
 			j++;
 			}
 
-		if(grille[i][j] == this.joueurActif)
+		if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
 			{
 			int cpt = 0;
 			while(coup.i + cpt < i)
 				{
 				grille[coup.i + cpt][coup.j + cpt] = this.joueurActif;
+				System.out.println("DBD> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
 				cpt++;
 				}
 			}
 
 		//Traitement Diagonal (Haut,Gauche)
-		i = coup.i-1;
-		j = coup.j-1;
-		while(grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif && i < 8 && i >= 0 && j < 8 && j >= 0)
+		i = coup.i - 1;
+		j = coup.j - 1;
+		while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
 			{
 			i--;
 			j--;
 			}
 
-		if(grille[i][j] == this.joueurActif)
+		if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
 			{
 			int cpt = 0;
 			while(coup.i + cpt > i)
 				{
 				grille[coup.i + cpt][coup.j + cpt] = this.joueurActif;
+				System.out.println("DHG> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
 				cpt--;
 				}
 			}
 
 		//Traitement Diagonal (Haut,Droite)
-		i = coup.i+1;
-		j = coup.j-1;
-		while(grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif && i < 8 && i >= 0 && j < 8 && j >= 0)
+		i = coup.i + 1;
+		j = coup.j - 1;
+		while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
 			{
 			i++;
 			j--;
 			}
 
-		if(grille[i][j] == this.joueurActif)
+		if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
 			{
 			int cpt = 0;
 			while(coup.i + cpt > i)
 				{
 				grille[coup.i + cpt][coup.j - cpt] = this.joueurActif;
+				System.out.println("DHD> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
 				cpt++;
 				}
 			}
 
-		//Traitement Diagonal (Haut,Droite)
-		i = coup.i-1;
-		j = coup.j+1;
-		while(grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif && i < 8 && i >= 0 && j < 8 && j >= 0)
+		//Traitement Diagonal (Bas,Gauche)
+		i = coup.i - 1;
+		j = coup.j + 1;
+		while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
 			{
 			i--;
 			j++;
 			}
 
-		if(grille[i][j] == this.joueurActif)
+		if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
 			{
 			int cpt = 0;
 			while(coup.i + cpt > i)
 				{
 				grille[coup.i + cpt][coup.j - cpt] = this.joueurActif;
+				System.out.println("DBD> (" + (coup.i + cpt) + "," + (coup.i - cpt) + ")");
 				cpt--;
 				}
 			}
@@ -212,7 +223,7 @@ public class Plateau
 		return new Plateau(this, 1 - this.joueurActif);
 		}
 
-	public void  afficherPlateau()
+	public void afficherPlateau()
 		{
 		for(int i = 0; i < 8; i++)
 			{

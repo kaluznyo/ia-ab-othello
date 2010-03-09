@@ -20,11 +20,11 @@ public class Plateau
 	|*							Constructeurs							*|
 	\*------------------------------------------------------------------*/
 
-	public Plateau(int joueurActif, int nbPionsBlancs, int nbPionsNoirs, int nbCoupsJoues)
+	public Plateau(int joueurActif, int nbPionsBleu, int nbPionsRouge, int nbCoupsJoues)
 		{
 		this.joueurActif = joueurActif;
-		this.nbPionsBlancs = nbPionsBlancs;
-		this.nbPionsNoirs = nbPionsNoirs;
+		this.nbPionsBleu = nbPionsBleu;
+		this.nbPionsRouge = nbPionsRouge;
 		this.nbCoupsJoues = nbCoupsJoues;
 		initGrille();
 		this.eval = evalPlateau();
@@ -32,7 +32,7 @@ public class Plateau
 
 	public Plateau(Plateau plateau, int joueurActif)
 		{
-		this(joueurActif, plateau.nbPionsBlancs, plateau.nbPionsNoirs, plateau.nbCoupsJoues);
+		this(joueurActif, plateau.nbPionsBleu, plateau.nbPionsRouge, plateau.nbCoupsJoues);
 		for(int i = 0; i < 8; i++)
 			{
 			System.arraycopy(plateau.grille[i], 0, this.grille[i], 0, 8);
@@ -41,7 +41,7 @@ public class Plateau
 
 	public Plateau(Plateau plateau)
 		{
-		this(plateau.joueurActif, plateau.nbPionsBlancs, plateau.nbPionsNoirs, plateau.nbCoupsJoues);
+		this(plateau.joueurActif, plateau.nbPionsBleu, plateau.nbPionsRouge, plateau.nbCoupsJoues);
 		for(int i = 0; i < 8; i++)
 			{
 			System.arraycopy(plateau.grille[i], 0, this.grille[i], 0, 8);
@@ -54,7 +54,7 @@ public class Plateau
 
 	public int nbCasesVides()
 		{
-		return 64 - nbPionsBlancs - nbPionsNoirs;
+		return 64 - nbPionsBleu - nbPionsRouge;
 		}
 
 	public int evalGrille()
@@ -62,6 +62,7 @@ public class Plateau
 		return 0;
 		}
 
+	// Met à jour la grille à partir du coup joué
 	public void miseAJourGrille(Move coup1)
 		{
 		Move coup = new Move(coup1.j, coup1.i);
@@ -69,7 +70,7 @@ public class Plateau
 		int j = coup.j;
 		System.out.println("Pos Coup = (" + i + "," + j + ")");
 		grille[i][j] = this.joueurActif;
-
+		int nbPiecesRetournees = 0;
 		//Traitement vertical (Bas)
 		j++;
 		while(j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
@@ -80,10 +81,13 @@ public class Plateau
 
 		if (j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
 			{
-			for(int j2 = coup.j; j2 < j; j2++)
+			for(int j2 = coup.j + 1; j2 < j; j2++)
 				{
 				grille[i][j2] = this.joueurActif;
 				System.out.println("VB> (" + i + "," + j2 + ")");
+				nbPiecesRetournees++;
+				//				if (this.joueurActif == K_BLEU)
+				//
 				}
 			}
 
@@ -96,10 +100,11 @@ public class Plateau
 
 		if (j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
 			{
-			for(int j2 = coup.j; j2 > j; j2--)
+			for(int j2 = coup.j - 1; j2 > j; j2--)
 				{
 				grille[i][j2] = this.joueurActif;
 				System.out.println("VH> (" + i + "," + j2 + ")");
+				nbPiecesRetournees++;
 				}
 			}
 
@@ -113,10 +118,11 @@ public class Plateau
 
 		if (i < 8 && i >= 0 && grille[i][j] == this.joueurActif)
 			{
-			for(int i2 = coup.i; i2 > i; i2--)
+			for(int i2 = coup.i - 1; i2 > i; i2--)
 				{
 				grille[i2][j] = this.joueurActif;
 				System.out.println("HG> (" + i2 + "," + j + ")");
+				nbPiecesRetournees++;
 				}
 			}
 
@@ -129,10 +135,11 @@ public class Plateau
 
 		if (i < 8 && i >= 0 && grille[i][j] == this.joueurActif)
 			{
-			for(int i2 = coup.i; i2 < i; i2++)
+			for(int i2 = coup.i + 1; i2 < i; i2++)
 				{
 				grille[i2][j] = this.joueurActif;
 				System.out.println("HD> (" + i2 + "," + j + ")");
+				nbPiecesRetournees++;
 				}
 			}
 
@@ -147,12 +154,14 @@ public class Plateau
 
 		if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
 			{
+			nbPiecesRetournees--;
 			int cpt = 0;
 			while(coup.i + cpt < i)
 				{
 				grille[coup.i + cpt][coup.j + cpt] = this.joueurActif;
 				System.out.println("DBD> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
 				cpt++;
+				nbPiecesRetournees++;
 				}
 			}
 
@@ -167,12 +176,14 @@ public class Plateau
 
 		if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
 			{
+			nbPiecesRetournees--;
 			int cpt = 0;
 			while(coup.i + cpt > i)
 				{
 				grille[coup.i + cpt][coup.j + cpt] = this.joueurActif;
 				System.out.println("DHG> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
 				cpt--;
+				nbPiecesRetournees++;
 				}
 			}
 
@@ -187,12 +198,14 @@ public class Plateau
 
 		if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
 			{
+			nbPiecesRetournees--;
 			int cpt = 0;
 			while(coup.i + cpt > i)
 				{
 				grille[coup.i + cpt][coup.j - cpt] = this.joueurActif;
 				System.out.println("DHD> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
 				cpt++;
+				nbPiecesRetournees++;
 				}
 			}
 
@@ -207,15 +220,47 @@ public class Plateau
 
 		if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
 			{
+			nbPiecesRetournees--;
 			int cpt = 0;
 			while(coup.i + cpt > i)
 				{
 				grille[coup.i + cpt][coup.j - cpt] = this.joueurActif;
 				System.out.println("DBD> (" + (coup.i + cpt) + "," + (coup.i - cpt) + ")");
+				nbPiecesRetournees++;
 				cpt--;
 				}
 			}
 
+
+		System.out.println("Pions retournés:" + nbPiecesRetournees);
+
+		// Mise à jour du nombre de pions de chaque joueur
+		if (this.joueurActif == K_BLEU)
+			{
+			nbPionsBleu += nbPiecesRetournees + 1;
+			nbPionsRouge -= nbPiecesRetournees;
+			}
+		else
+			{
+			nbPionsBleu -= nbPiecesRetournees;
+			nbPionsRouge += nbPiecesRetournees + 1;
+			}
+		System.out.println("Pions bleu=" + nbPionsBleu + "/ rouge =" + nbPionsRouge);
+		}
+
+	public void calculerCoupsPossibles()
+		{
+		// Récupère les pions du joueur actif
+		for(int i = 0; i < 8; i++)
+			{
+			for(int j = 0; j < 8; j++)
+				{
+				if (grille[i][j] == joueurActif)
+					{
+					;
+					}
+				}
+			}
 		}
 
 	public Plateau getProchainPlateau()
@@ -229,7 +274,14 @@ public class Plateau
 			{
 			for(int j = 0; j < 8; j++)
 				{
-				System.out.print(this.grille[i][j] + ", ");
+				if (this.grille[i][j] == K_VIDE)
+					{
+					System.out.print("x ");
+					}
+				else
+					{
+					System.out.print(this.grille[i][j] + " ");
+					}
 				}
 			System.out.println();
 			}
@@ -241,6 +293,7 @@ public class Plateau
 
 	private void initGrille()
 		{
+		// Initialise la grille avec toutes les cases vides
 		this.grille = new int[8][8];
 		for(int i = 0; i < 8; i++)
 			{
@@ -249,6 +302,8 @@ public class Plateau
 				this.grille[i][j] = K_VIDE;
 				}
 			}
+
+		// Initialise les 4 pions de base
 		this.grille[3][3] = K_BLEU;
 		this.grille[4][4] = K_BLEU;
 		this.grille[3][4] = K_ROUGE;
@@ -306,8 +361,8 @@ public class Plateau
 	private int grille[][];
 	private int joueurActif;
 	private Move coupsPossibles[];
-	private int nbPionsBlancs;
-	private int nbPionsNoirs;
+	private int nbPionsBleu;
+	private int nbPionsRouge;
 	private int nbCoupsJoues;
 	private int eval;
 

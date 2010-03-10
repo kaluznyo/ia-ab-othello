@@ -27,7 +27,6 @@ public class Joueur extends Othello.Joueur
 	Scanner stdin = new Scanner(System.in);
 
 	// Méthode appelée à chaque fois que vous devez jouer un coup.
-	// move est le coup joué par l'adversaire
 	@Override public Move nextPlay(Move move)
 		{
 		// Ici, vous devrez

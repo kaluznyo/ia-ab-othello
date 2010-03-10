@@ -74,16 +74,20 @@ public class Plateau
 		grille[i][j] = this.joueurActif;
 		int nbPiecesRetournees = 0;
 
+		// Variation de i
 		for(int angleI = -1; angleI <= 1; angleI++)
 			{
+			// variation de j
 			for(int angleJ = -1; angleJ <= 1; angleJ++)
 				{
+				// On ne prend pas en compte le cas ou i et j sont nuls
 				if (!(angleI == 0 && angleJ == 0))
 					{
-					//System.out.println("angleI,J=("+angleI+","+angleJ+")");
+					// Initialisation de la position de recherche initiale (case à côté de la position intiale)
 					i = coup.i + angleI;
 					j = coup.j + angleJ;
-					while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
+					// parcours pour chercher les cases que l'on peut retourner
+					while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == (1 - this.joueurActif))
 						{
 						i += angleI;
 						j += angleJ;
@@ -92,21 +96,11 @@ public class Plateau
 					// Traitement pour retourner les pièces
 					if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
 						{
-						System.out.println("(i,j)=("+i+","+j+")+JA="+grille[i][j]+"/me="+this.joueurActif);
-						// TODO: corriger le nb de pièces retournées
-						if (angleI != 0 || angleJ != 0)
-							{
-							nbPiecesRetournees--;
-							}
-						int cpt = 0;
-						System.out.println(coup.i+"+"+cpt+"*"+angleI+"<"+i + " || "+coup.j+"+"+cpt+"*"+angleJ+"<"+j);
-						boolean testI = (coup.i + cpt )* angleI < i*angleI;
-						boolean testJ = (coup.j + cpt )* angleJ < j*angleJ;
-						System.out.println("testI=" + testI + " / testJ="+ testJ);
-						while((coup.i + cpt )* angleI < i*angleI || (coup.j + cpt )* angleJ < j*angleJ)
+						int cpt = 1;
+						// Retournement des pièces
+						while((coup.i + cpt * angleI) * angleI < i * angleI || (coup.j + cpt * angleJ) * angleJ < j * angleJ)
 							{
 							grille[coup.i + angleI * cpt][coup.j + angleJ * cpt] = this.joueurActif;
-							System.out.println("DBD> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
 							cpt++;
 							nbPiecesRetournees++;
 							}
@@ -114,6 +108,7 @@ public class Plateau
 					}
 				}
 			}
+
 		System.out.println("Pions retournés:" + nbPiecesRetournees);
 
 		// Mise à jour du nombre de pions de chaque joueur
@@ -127,8 +122,8 @@ public class Plateau
 			nbPionsBleu -= nbPiecesRetournees;
 			nbPionsRouge += nbPiecesRetournees + 1;
 			}
-		System.out.println("Pions bleu=" + nbPionsBleu + "/ rouge =" + nbPionsRouge);
 
+		System.out.println("Pions bleu=" + nbPionsBleu + "/ rouge =" + nbPionsRouge);
 		}
 
 	public ArrayList<Move> rechercheCoupsPossibles(Move coup1)
@@ -148,7 +143,7 @@ public class Plateau
 					{
 					i = coup.i + angleI;
 					j = coup.j + angleJ;
-					while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] ==(1-this.joueurActif))
+					while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == (1 - this.joueurActif))
 						{
 						i += angleI;
 						j += angleJ;
@@ -158,7 +153,7 @@ public class Plateau
 					if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == K_VIDE && (i != coup.i + angleI || j != coup.j + angleJ))
 						{
 						// Stockage du pion dans un arraylist
-						tabCoupsPossibles.add(new Move(i,j));
+						tabCoupsPossibles.add(new Move(i, j));
 						}
 					}
 				}
@@ -166,190 +161,192 @@ public class Plateau
 		return tabCoupsPossibles;
 		}
 
-	//	// Met à jour la grille à partir du coup joué
-	//	public void miseAJourGrille(Move coup1)
-	//		{
-	//		Move coup = new Move(coup1.j, coup1.i);
-	//		int i = coup.i;
-	//		int j = coup.j;
-	//		System.out.println("Pos Coup = (" + i + "," + j + ")");
-	//		grille[i][j] = this.joueurActif;
-	//		int nbPiecesRetournees = 0;
-	//		//Traitement vertical (Bas)
-	//		j++;
-	//		while(j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
-	//			{
-	//			System.out.println("Test" + j);
-	//			j++;
-	//			}
-	//
-	//		if (j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
-	//			{
-	//			for(int j2 = coup.j + 1; j2 < j; j2++)
-	//				{
-	//				grille[i][j2] = this.joueurActif;
-	//				System.out.println("VB> (" + i + "," + j2 + ")");
-	//				nbPiecesRetournees++;
-	//				//				if (this.joueurActif == K_BLEU)
-	//				//
-	//				}
-	//			}
-	//
-	//		//Traitement vertical (Haut)
-	//		j = coup.j - 1;
-	//		while(j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
-	//			{
-	//			j--;
-	//			}
-	//
-	//		if (j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
-	//			{
-	//			for(int j2 = coup.j - 1; j2 > j; j2--)
-	//				{
-	//				grille[i][j2] = this.joueurActif;
-	//				System.out.println("VH> (" + i + "," + j2 + ")");
-	//				nbPiecesRetournees++;
-	//				}
-	//			}
-	//
-	//		//Traitement horizontal (Gauche)
-	//		j = coup.j;
-	//		i = coup.i - 1;
-	//		while(i < 8 && i >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
-	//			{
-	//			i--;
-	//			}
-	//
-	//		if (i < 8 && i >= 0 && grille[i][j] == this.joueurActif)
-	//			{
-	//			for(int i2 = coup.i - 1; i2 > i; i2--)
-	//				{
-	//				grille[i2][j] = this.joueurActif;
-	//				System.out.println("HG> (" + i2 + "," + j + ")");
-	//				nbPiecesRetournees++;
-	//				}
-	//			}
-	//
-	//		//Traitement horizontal (Droite)
-	//		i = coup.i + 1;
-	//		while(i < 8 && i >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
-	//			{
-	//			i++;
-	//			}
-	//
-	//		if (i < 8 && i >= 0 && grille[i][j] == this.joueurActif)
-	//			{
-	//			for(int i2 = coup.i + 1; i2 < i; i2++)
-	//				{
-	//				grille[i2][j] = this.joueurActif;
-	//				System.out.println("HD> (" + i2 + "," + j + ")");
-	//				nbPiecesRetournees++;
-	//				}
-	//			}
-	//
-	//		//Traitement Diagonal (Bas,Droite)
-	//		i = coup.i + 1;
-	//		j = coup.j + 1;
-	//		while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
-	//			{
-	//			i++;
-	//			j++;
-	//			}
-	//
-	//		if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
-	//			{
-	//			nbPiecesRetournees--;
-	//			int cpt = 0;
-	//			while(coup.i + cpt < i)
-	//				{
-	//				grille[coup.i + cpt][coup.j + cpt] = this.joueurActif;
-	//				System.out.println("DBD> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
-	//				cpt++;
-	//				nbPiecesRetournees++;
-	//				}
-	//			}
-	//
-	//		//Traitement Diagonal (Haut,Gauche)
-	//		i = coup.i - 1;
-	//		j = coup.j - 1;
-	//		while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
-	//			{
-	//			i--;
-	//			j--;
-	//			}
-	//
-	//		if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
-	//			{
-	//			nbPiecesRetournees--;
-	//			int cpt = 0;
-	//			while(coup.i + cpt > i)
-	//				{
-	//				grille[coup.i + cpt][coup.j + cpt] = this.joueurActif;
-	//				System.out.println("DHG> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
-	//				cpt--;
-	//				nbPiecesRetournees++;
-	//				}
-	//			}
-	//
-	//		//Traitement Diagonal (Haut,Droite)
-	//		i = coup.i + 1;
-	//		j = coup.j - 1;
-	//		while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
-	//			{
-	//			i++;
-	//			j--;
-	//			}
-	//
-	//		if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
-	//			{
-	//			nbPiecesRetournees--;
-	//			int cpt = 0;
-	//			while(coup.i + cpt > i)
-	//				{
-	//				grille[coup.i + cpt][coup.j - cpt] = this.joueurActif;
-	//				System.out.println("DHD> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
-	//				cpt++;
-	//				nbPiecesRetournees++;
-	//				}
-	//			}
-	//
-	//		//Traitement Diagonal (Bas,Gauche)
-	//		i = coup.i - 1;
-	//		j = coup.j + 1;
-	//		while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
-	//			{
-	//			i--;
-	//			j++;
-	//			}
-	//
-	//		if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
-	//			{
-	//			nbPiecesRetournees--;
-	//			int cpt = 0;
-	//			while(coup.i + cpt > i)
-	//				{
-	//				grille[coup.i + cpt][coup.j - cpt] = this.joueurActif;
-	//				System.out.println("DBD> (" + (coup.i + cpt) + "," + (coup.i - cpt) + ")");
-	//				nbPiecesRetournees++;
-	//				cpt--;
-	//				}
-	//			}
-	//
-	//		System.out.println("Pions retournés:" + nbPiecesRetournees);
-	//
-	//		// Mise à jour du nombre de pions de chaque joueur
-	//		if (this.joueurActif == K_BLEU)
-	//			{
-	//			nbPionsBleu += nbPiecesRetournees + 1;
-	//			nbPionsRouge -= nbPiecesRetournees;
-	//			}
-	//		else
-	//			{
-	//			nbPionsBleu -= nbPiecesRetournees;
-	//			nbPionsRouge += nbPiecesRetournees + 1;
-	//			}
-	//		System.out.println("Pions bleu=" + nbPionsBleu + "/ rouge =" + nbPionsRouge);
-	//		}
+	/*
+		// Met à jour la grille à partir du coup joué
+		public void miseAJourGrille(Move coup1)
+			{
+			Move coup = new Move(coup1.j, coup1.i);
+			int i = coup.i;
+			int j = coup.j;
+			System.out.println("Pos Coup = (" + i + "," + j + ")");
+			grille[i][j] = this.joueurActif;
+			int nbPiecesRetournees = 0;
+			//Traitement vertical (Bas)
+			j++;
+			while(j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
+				{
+				System.out.println("Test" + j);
+				j++;
+				}
+
+			if (j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
+				{
+				for(int j2 = coup.j + 1; j2 < j; j2++)
+					{
+					grille[i][j2] = this.joueurActif;
+					System.out.println("VB> (" + i + "," + j2 + ")");
+					nbPiecesRetournees++;
+					//				if (this.joueurActif == K_BLEU)
+					//
+					}
+				}
+
+			//Traitement vertical (Haut)
+			j = coup.j - 1;
+			while(j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
+				{
+				j--;
+				}
+
+			if (j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
+				{
+				for(int j2 = coup.j - 1; j2 > j; j2--)
+					{
+					grille[i][j2] = this.joueurActif;
+					System.out.println("VH> (" + i + "," + j2 + ")");
+					nbPiecesRetournees++;
+					}
+				}
+
+			//Traitement horizontal (Gauche)
+			j = coup.j;
+			i = coup.i - 1;
+			while(i < 8 && i >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
+				{
+				i--;
+				}
+
+			if (i < 8 && i >= 0 && grille[i][j] == this.joueurActif)
+				{
+				for(int i2 = coup.i - 1; i2 > i; i2--)
+					{
+					grille[i2][j] = this.joueurActif;
+					System.out.println("HG> (" + i2 + "," + j + ")");
+					nbPiecesRetournees++;
+					}
+				}
+
+			//Traitement horizontal (Droite)
+			i = coup.i + 1;
+			while(i < 8 && i >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
+				{
+				i++;
+				}
+
+			if (i < 8 && i >= 0 && grille[i][j] == this.joueurActif)
+				{
+				for(int i2 = coup.i + 1; i2 < i; i2++)
+					{
+					grille[i2][j] = this.joueurActif;
+					System.out.println("HD> (" + i2 + "," + j + ")");
+					nbPiecesRetournees++;
+					}
+				}
+
+			//Traitement Diagonal (Bas,Droite)
+			i = coup.i + 1;
+			j = coup.j + 1;
+			while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
+				{
+				i++;
+				j++;
+				}
+
+			if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
+				{
+				nbPiecesRetournees--;
+				int cpt = 0;
+				while(coup.i + cpt < i)
+					{
+					grille[coup.i + cpt][coup.j + cpt] = this.joueurActif;
+					System.out.println("DBD> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
+					cpt++;
+					nbPiecesRetournees++;
+					}
+				}
+
+			//Traitement Diagonal (Haut,Gauche)
+			i = coup.i - 1;
+			j = coup.j - 1;
+			while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
+				{
+				i--;
+				j--;
+				}
+
+			if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
+				{
+				nbPiecesRetournees--;
+				int cpt = 0;
+				while(coup.i + cpt > i)
+					{
+					grille[coup.i + cpt][coup.j + cpt] = this.joueurActif;
+					System.out.println("DHG> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
+					cpt--;
+					nbPiecesRetournees++;
+					}
+				}
+
+			//Traitement Diagonal (Haut,Droite)
+			i = coup.i + 1;
+			j = coup.j - 1;
+			while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
+				{
+				i++;
+				j--;
+				}
+
+			if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
+				{
+				nbPiecesRetournees--;
+				int cpt = 0;
+				while(coup.i + cpt > i)
+					{
+					grille[coup.i + cpt][coup.j - cpt] = this.joueurActif;
+					System.out.println("DHD> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
+					cpt++;
+					nbPiecesRetournees++;
+					}
+				}
+
+			//Traitement Diagonal (Bas,Gauche)
+			i = coup.i - 1;
+			j = coup.j + 1;
+			while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
+				{
+				i--;
+				j++;
+				}
+
+			if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
+				{
+				nbPiecesRetournees--;
+				int cpt = 0;
+				while(coup.i + cpt > i)
+					{
+					grille[coup.i + cpt][coup.j - cpt] = this.joueurActif;
+					System.out.println("DBD> (" + (coup.i + cpt) + "," + (coup.i - cpt) + ")");
+					nbPiecesRetournees++;
+					cpt--;
+					}
+				}
+
+			System.out.println("Pions retournés:" + nbPiecesRetournees);
+
+			// Mise à jour du nombre de pions de chaque joueur
+			if (this.joueurActif == K_BLEU)
+				{
+				nbPionsBleu += nbPiecesRetournees + 1;
+				nbPionsRouge -= nbPiecesRetournees;
+				}
+			else
+				{
+				nbPionsBleu -= nbPiecesRetournees;
+				nbPionsRouge += nbPiecesRetournees + 1;
+				}
+			System.out.println("Pions bleu=" + nbPionsBleu + "/ rouge =" + nbPionsRouge);
+			}
+		*/
 
 	public ArrayList<Move> getPionsJoueurs()
 		{

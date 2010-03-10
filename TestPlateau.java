@@ -19,6 +19,12 @@ public class TestPlateau
 		plateau2.miseAJourGrille(new Move(2,2));
 		System.out.println();
 		plateau2.afficherPlateau();
+//
+//		ArrayList<Move> tmp = plateau2.rechercheCoupsPossibles(new Move(3,3));
+//		for(Move move:tmp)
+//			{
+//			System.out.println("MovePossible= (" + move.i +","+move.j+")");
+//			}
 
 		Plateau plateau3 = new Plateau(plateau2.getProchainPlateau());
 		plateau3.miseAJourGrille(new Move(5,4));

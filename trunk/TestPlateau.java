@@ -1,6 +1,8 @@
 
 package Participants.FroidevauxKaluznyNeuhaus;
 
+import java.util.ArrayList;
+
 import Othello.Move;
 
 
@@ -9,37 +11,37 @@ public class TestPlateau
 
 	public static void main(String[] args)
 		{
-		Plateau plateau = new Plateau(0, 2, 2, 0);
-		plateau.afficherPlateau();
-		plateau.miseAJourGrille(new Move(2,3));
+		Board plateau = new Board(0, 2, 2, 0);
+		plateau.displayBoard();
+		plateau.updateBoard(new Move(2,3));
 		System.out.println();
-		plateau.afficherPlateau();
+		plateau.displayBoard();
 
-		Plateau plateau2 = new Plateau(plateau.getProchainPlateau());
-		plateau2.miseAJourGrille(new Move(2,2));
+		Board plateau2 = new Board(plateau.getNextBoard());
+		plateau2.updateBoard(new Move(2,2));
 		System.out.println();
-		plateau2.afficherPlateau();
-//
-//		ArrayList<Move> tmp = plateau2.rechercheCoupsPossibles(new Move(3,3));
-//		for(Move move:tmp)
-//			{
-//			System.out.println("MovePossible= (" + move.i +","+move.j+")");
-//			}
+		plateau2.displayBoard();
 
-		Plateau plateau3 = new Plateau(plateau2.getProchainPlateau());
-		plateau3.miseAJourGrille(new Move(5,4));
-		System.out.println();
-		plateau3.afficherPlateau();
+		ArrayList<Move> tmp = plateau2.rechercheCoupsPossibles(new Move(3,3));
+		for(Move move:tmp)
+			{
+			System.out.println("MovePossible= (" + move.i +","+move.j+")");
+			}
 
-		Plateau plateau4 = new Plateau(plateau3.getProchainPlateau());
-		plateau4.miseAJourGrille(new Move(2,4));
+		Board plateau3 = new Board(plateau2.getNextBoard());
+		plateau3.updateBoard(new Move(5,4));
 		System.out.println();
-		plateau4.afficherPlateau();
+		plateau3.displayBoard();
 
-		Plateau plateau5 = new Plateau(plateau4.getProchainPlateau());
-		plateau5.miseAJourGrille(new Move(1,1));
+		Board plateau4 = new Board(plateau3.getNextBoard());
+		plateau4.updateBoard(new Move(2,4));
 		System.out.println();
-		plateau5.afficherPlateau();
+		plateau4.displayBoard();
+
+		Board plateau5 = new Board(plateau4.getNextBoard());
+		plateau5.updateBoard(new Move(1,1));
+		System.out.println();
+		plateau5.displayBoard();
 
 		}
 	}

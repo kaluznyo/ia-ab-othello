@@ -52,4 +52,33 @@ public class Joueur extends Othello.Joueur
 		return result;
 		}
 
+	// minormax = 1: maximize
+	// minormax = -1: minimize
+	// TODO: must return a couple (BoardEval, Move)
+	public void alphabeta(Board root, int depth, int minormax, int parentValue)
+		{
+		if (depth == 0 || root.isFinal())
+			{
+			// Retourne l'Žvaluation de la grille et il n'y a plus de coups possibles
+			//return root.evalGrille(), None
+			}
+		int optVal = minormax * -Integer.MIN_VALUE;
+		Move optOp = null;
+
+		/*for(Move op:root.findAvailableMoves())
+			{
+			Board newState = new Board(root, op);
+			val, dummy = alphabeta(newState, depth-1, -minormax, optVal);
+			if (val*minormax > optVal * minormax)
+				{
+				optVal = val;
+				optOp = op;
+				if (optVal*minormax > parentValue * minormax)
+					{
+					break;
+					}
+				}
+			}
+		return optVal, optOp;*/
+		}
 	}

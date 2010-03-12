@@ -16,63 +16,64 @@ import Othello.Move;
 // Pour l'interopÈrabilitÈ: il faut une reprÈsentation commune des coups!
 
 // Vous devrez Ètendre Othello.Joueur pour implÈmenter votre propre joueur...
-public class Plateau
+public class Board
 	{
 
 	/*------------------------------------------------------------------*\
 	|*							Constructeurs							*|
 	\*------------------------------------------------------------------*/
 
-	public Plateau(int joueurActif, int nbPionsBleu, int nbPionsRouge, int nbCoupsJoues)
+	public Board(int activePlayer, int bluePiecesNb, int redPiecesNb, int movesPlayed)
 		{
-		this.joueurActif = joueurActif;
-		this.nbPionsBleu = nbPionsBleu;
-		this.nbPionsRouge = nbPionsRouge;
-		this.nbCoupsJoues = nbCoupsJoues;
-		initGrille();
-		this.eval = evalPlateau();
+		this.activePlayer = activePlayer;
+		this.bluePiecesNb = bluePiecesNb;
+		this.redPiecesNb = redPiecesNb;
+		this.movesPlayed = movesPlayed;
+		initBoard();
+		this.eval = evalBoard();
 		}
 
-	public Plateau(Plateau plateau, int joueurActif)
+	public Board(Board board, int activePlayer)
 		{
-		this(joueurActif, plateau.nbPionsBleu, plateau.nbPionsRouge, plateau.nbCoupsJoues);
+		this(activePlayer, board.bluePiecesNb, board.redPiecesNb, board.movesPlayed);
 		for(int i = 0; i < 8; i++)
 			{
-			System.arraycopy(plateau.grille[i], 0, this.grille[i], 0, 8);
+			System.arraycopy(board.grid[i], 0, this.grid[i], 0, 8);
 			}
 		}
 
-	public Plateau(Plateau plateau)
+	public Board(Board plateau)
 		{
-		this(plateau.joueurActif, plateau.nbPionsBleu, plateau.nbPionsRouge, plateau.nbCoupsJoues);
+		this(plateau.activePlayer, plateau.bluePiecesNb, plateau.redPiecesNb, plateau.movesPlayed);
 		for(int i = 0; i < 8; i++)
 			{
-			System.arraycopy(plateau.grille[i], 0, this.grille[i], 0, 8);
+			System.arraycopy(plateau.grid[i], 0, this.grid[i], 0, 8);
 			}
+		}
+
+	public Board(Board oldState, Move move)
+		{
+		this(oldState);
+		this.updateBoard(move);
 		}
 
 	/*------------------------------------------------------------------*\
 	|*							Methodes Public							*|
 	\*------------------------------------------------------------------*/
 
-	public int nbCasesVides()
+	public int emptyCaseNb()
 		{
-		return 64 - nbPionsBleu - nbPionsRouge;
+		return 64 - bluePiecesNb - redPiecesNb;
 		}
 
-	public int evalGrille()
+	public void updateBoard(Move move1)
 		{
-		return 0;
-		}
-
-	public void miseAJourGrille(Move coup1)
-		{
-		Move coup = new Move(coup1.j, coup1.i);
-		int i = coup.i;
-		int j = coup.j;
-		System.out.println("Pos Coup = (" + i + "," + j + ")");
-		grille[i][j] = this.joueurActif;
-		int nbPiecesRetournees = 0;
+		Move move = new Move(move1.j, move1.i);
+		int i = move.i;
+		int j = move.j;
+		System.out.println("Move Pos = (" + i + "," + j + ")");
+		grid[i][j] = this.activePlayer;
+		int flippedPiecesNb = 0;
 
 		// Variation de i
 		for(int angleI = -1; angleI <= 1; angleI++)
@@ -84,56 +85,56 @@ public class Plateau
 				if (!(angleI == 0 && angleJ == 0))
 					{
 					// Initialisation de la position de recherche initiale (case à côté de la position intiale)
-					i = coup.i + angleI;
-					j = coup.j + angleJ;
+					i = move.i + angleI;
+					j = move.j + angleJ;
 					// parcours pour chercher les cases que l'on peut retourner
-					while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == (1 - this.joueurActif))
+					while(i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == (1 - this.activePlayer))
 						{
 						i += angleI;
 						j += angleJ;
 						}
 
 					// Traitement pour retourner les pièces
-					if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
+					if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
 						{
 						int cpt = 1;
 						// Retournement des pièces
-						while((coup.i + cpt * angleI) * angleI < i * angleI || (coup.j + cpt * angleJ) * angleJ < j * angleJ)
+						while((move.i + cpt * angleI) * angleI < i * angleI || (move.j + cpt * angleJ) * angleJ < j * angleJ)
 							{
-							grille[coup.i + angleI * cpt][coup.j + angleJ * cpt] = this.joueurActif;
+							grid[move.i + angleI * cpt][move.j + angleJ * cpt] = this.activePlayer;
 							cpt++;
-							nbPiecesRetournees++;
+							flippedPiecesNb++;
 							}
 						}
 					}
 				}
 			}
 
-		System.out.println("Pions retournés:" + nbPiecesRetournees);
+		System.out.println("Pions retournés:" + flippedPiecesNb);
 
 		// Mise à jour du nombre de pions de chaque joueur
-		if (this.joueurActif == K_BLEU)
+		if (this.activePlayer == K_BLUE)
 			{
-			nbPionsBleu += nbPiecesRetournees + 1;
-			nbPionsRouge -= nbPiecesRetournees;
+			bluePiecesNb += flippedPiecesNb + 1;
+			redPiecesNb -= flippedPiecesNb;
 			}
 		else
 			{
-			nbPionsBleu -= nbPiecesRetournees;
-			nbPionsRouge += nbPiecesRetournees + 1;
+			bluePiecesNb -= flippedPiecesNb;
+			redPiecesNb += flippedPiecesNb + 1;
 			}
 
-		System.out.println("Pions bleu=" + nbPionsBleu + "/ rouge =" + nbPionsRouge);
+		System.out.println("Pions bleu=" + bluePiecesNb + "/ rouge =" + redPiecesNb);
 		}
 
-	public ArrayList<Move> rechercheCoupsPossibles(Move coup1)
+	public ArrayList<Move> rechercheCoupsPossibles(Move move1)
 		{
-		Move coup = new Move(coup1.j, coup1.i);
-		int i = coup.i;
-		int j = coup.j;
+		Move move = new Move(move1.j, move1.i);
+		int i = move.i;
+		int j = move.j;
 		System.out.println("Pos Coup = (" + i + "," + j + ")");
-		grille[i][j] = this.joueurActif;
-		ArrayList<Move> tabCoupsPossibles = new ArrayList<Move>();
+		grid[i][j] = this.activePlayer;
+		ArrayList<Move> availableMoves = new ArrayList<Move>();
 
 		for(int angleI = -1; angleI <= 1; angleI++)
 			{
@@ -141,24 +142,24 @@ public class Plateau
 				{
 				if (angleI != 0 || angleJ != 0)
 					{
-					i = coup.i + angleI;
-					j = coup.j + angleJ;
-					while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == (1 - this.joueurActif))
+					i = move.i + angleI;
+					j = move.j + angleJ;
+					while(i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == (1 - this.activePlayer))
 						{
 						i += angleI;
 						j += angleJ;
 						}
 
 					// Prochaine case vide après des cases blanches
-					if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == K_VIDE && (i != coup.i + angleI || j != coup.j + angleJ))
+					if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == K_EMPTY && (i != move.i + angleI || j != move.j + angleJ))
 						{
 						// Stockage du pion dans un arraylist
-						tabCoupsPossibles.add(new Move(i, j));
+						availableMoves.add(new Move(i, j));
 						}
 					}
 				}
 			}
-		return tabCoupsPossibles;
+		return availableMoves;
 		}
 
 	/*
@@ -348,120 +349,138 @@ public class Plateau
 			}
 		*/
 
-	public ArrayList<Move> getPionsJoueurs()
+	public ArrayList<Move> findPlayerPieces()
 		{
-		ArrayList<Move> tabPionsJoueurs = new ArrayList<Move>();
+		ArrayList<Move> playerPieces = new ArrayList<Move>();
 		// Récupère les pions du joueur actif
 		for(int i = 0; i < 8; i++)
 			{
 			for(int j = 0; j < 8; j++)
 				{
-				if (grille[i][j] == joueurActif)
+				if (grid[i][j] == activePlayer)
 					{
 					// Trouver les coups possibles
-					tabPionsJoueurs.add(new Move(i, j));
+					playerPieces.add(new Move(i, j));
 					}
 				}
 			}
-		return tabPionsJoueurs;
+		return playerPieces;
 		}
 
-	public HashSet<Move> calculerCoupsPossibles()
+	public HashSet<Move> findAvailableMoves()
 		{
-		ArrayList<Move> tabPionsJoueurs = getPionsJoueurs();
+		ArrayList<Move> playerPieces = findPlayerPieces();
+		HashSet<Move> operatorsAvailable = new HashSet<Move>();
 
-		for(Move move:tabPionsJoueurs)
+		for(Move move:playerPieces)
 			{
 			// Recherche coups possibles
-			rechercheCoupsPossibles(move);
+			for(Move move1:rechercheCoupsPossibles(move))
+				{
+				operatorsAvailable.add(move1);
+				}
 			}
 
-		return null;
-
+		return operatorsAvailable;
 		}
 
-	public Plateau getProchainPlateau()
+	public Board getNextBoard()
 		{
-		return new Plateau(this, 1 - this.joueurActif);
+		return new Board(this, 1 - this.activePlayer);
 		}
 
-	public void afficherPlateau()
+	public void displayBoard()
 		{
 		for(int i = 0; i < 8; i++)
 			{
 			for(int j = 0; j < 8; j++)
 				{
-				if (this.grille[i][j] == K_VIDE)
+				if (this.grid[i][j] == K_EMPTY)
 					{
 					System.out.print("x ");
 					}
 				else
 					{
-					System.out.print(this.grille[i][j] + " ");
+					System.out.print(this.grid[i][j] + " ");
 					}
 				}
 			System.out.println();
 			}
 		}
 
+
+
+	// IMPORTANT METHODS
+	public Board applyOp(Move move)
+		{
+		// return a new board with the move applied
+		return new Board(this, move);
+		}
+
+	public boolean isFinal()
+		{
+		return (this.findAvailableMoves().isEmpty() || this.emptyCaseNb()==0);
+		}
+
+	public int evalBoard()
+		{
+		// TODO Auto-generated method stub
+		// Evaluate the current state of the board
+		return 0;
+		}
+
 	/*------------------------------------------------------------------*\
 	|*							Methodes Private						*|
 	\*------------------------------------------------------------------*/
 
-	private void initGrille()
+	private void initBoard()
 		{
 		// Initialise la grille avec toutes les cases vides
-		this.grille = new int[8][8];
+		this.grid = new int[8][8];
 		for(int i = 0; i < 8; i++)
 			{
 			for(int j = 0; j < 8; j++)
 				{
-				this.grille[i][j] = K_VIDE;
+				this.grid[i][j] = K_EMPTY;
 				}
 			}
 
 		// Initialise les 4 pions de base
-		this.grille[3][3] = K_BLEU;
-		this.grille[4][4] = K_BLEU;
-		this.grille[3][4] = K_ROUGE;
-		this.grille[4][3] = K_ROUGE;
-		}
-
-	private int evalPlateau()
-		{
-		// TODO Auto-generated method stub
-		return 0;
+		this.grid[3][3] = K_BLUE;
+		this.grid[4][4] = K_BLUE;
+		this.grid[3][4] = K_RED;
+		this.grid[4][3] = K_RED;
 		}
 
 	/*------------------------------*\
 	|*				Set				*|
 	\*------------------------------*/
 
-	public void setJoueurActif(int joueurActif)
+	public void setActivePlayer(int activePlayer)
 		{
-		this.joueurActif = joueurActif;
+		this.activePlayer = activePlayer;
 		}
 
-	public void setGrille(int[][] grille)
+	public void setGrid(int[][] grid)
 		{
-		this.grille = grille;
+		this.grid = grid;
 		}
 
 	/*------------------------------*\
 	|*				Get				*|
 	\*------------------------------*/
 
-	public int[][] getGrille()
+	public int[][] getGrid()
 		{
-		return this.grille;
+		return this.grid;
 		}
 
-	public int getJoueurActif()
+	public int getActivePlayer()
 		{
-		return this.joueurActif;
+		return this.activePlayer;
 		}
 
-	public Move[] getCoupsPossibles()
+	public Move[] getAvailableMoves()
 		{
 		return this.coupsPossibles;
 		}
@@ -475,17 +494,15 @@ public class Plateau
 	|*							Attributs Private						*|
 	\*------------------------------------------------------------------*/
 
-	private int grille[][];
-	private int joueurActif;
+	private int grid[][];
+	private int activePlayer;
 	private Move coupsPossibles[];
-	private int nbPionsBleu;
-	private int nbPionsRouge;
-	private int nbCoupsJoues;
-	private int nbPionsRetournes;
+	private int bluePiecesNb;
+	private int redPiecesNb;
+	private int movesPlayed;
 	private int eval;
 
-	private static final int K_VIDE = -1;
-	private static final int K_ROUGE = 0;
-	private static final int K_BLEU = 1;
-
+	private static final int K_EMPTY = -1;
+	private static final int K_RED = 0;
+	private static final int K_BLUE = 1;
 	}

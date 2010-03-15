@@ -426,7 +426,7 @@ public class Board
 		{
 		// TODO Auto-generated method stub
 		// Evaluate the current state of the board
-		return 0;
+		return (int)(Math.random()*100);
 		}
 
 	/*------------------------------------------------------------------*\

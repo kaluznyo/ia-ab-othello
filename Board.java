@@ -20,14 +20,22 @@ public class Board
 	|*							Constructeurs							*|
 	\*------------------------------------------------------------------*/
 
-	public Board(int activePlayer, int bluePiecesNb, int redPiecesNb, int movesPlayed)
+	public Board(int activePlayer, int bluePiecesNb, int redPiecesNb, int movesPlayed, int owner)
 		{
 		this.activePlayer = activePlayer;
 		this.bluePiecesNb = bluePiecesNb;
 		this.redPiecesNb = redPiecesNb;
 		this.movesPlayed = movesPlayed;
+		this.owner = owner;
 		initBoard();
 		this.eval = evalBoard();
+		}
+
+	public int owner;
+
+	public Board(int activePlayer)
+		{
+		this(activePlayer, 2, 2, 0, 1-activePlayer);
 		}
 
 	/*public Board(Board board, int activePlayer)
@@ -38,10 +46,10 @@ public class Board
 			System.arraycopy(board.grid[i], 0, this.grid[i], 0, 8);
 			}
 		}
-*/
+	*/
 	public Board(Board plateau)
 		{
-		this(plateau.activePlayer, plateau.bluePiecesNb, plateau.redPiecesNb, plateau.movesPlayed);
+		this(plateau.activePlayer, plateau.bluePiecesNb, plateau.redPiecesNb, plateau.movesPlayed, plateau.owner);
 		for(int i = 0; i < 8; i++)
 			{
 			System.arraycopy(plateau.grid[i], 0, this.grid[i], 0, 8);
@@ -53,8 +61,8 @@ public class Board
 		this(oldState);
 		if (move != null)
 			{
-				this.updateBoard(move);
-				}
+			this.updateBoard(move);
+			}
 
 		this.activePlayer = 1 - this.activePlayer;
 		}
@@ -164,193 +172,191 @@ public class Board
 		return availableMoves;
 		}
 
-
-		// Met à jour la grille à partir du coup joué
-		/*public void updateBoard(Position coup)
+	// Met à jour la grille à partir du coup joué
+	/*public void updateBoard(Position coup)
+		{
+		//Move coup = new Move(coup1.j, coup1.i);
+		int i = coup.i;
+		int j = coup.j;
+		System.out.println("Pos Coup = (" + i + "," + j + ")");
+		grid[i][j] = this.activePlayer;
+		int nbPiecesRetournees = 0;
+		//Traitement vertical (Bas)
+		j++;
+		while(j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
 			{
-			//Move coup = new Move(coup1.j, coup1.i);
-			int i = coup.i;
-			int j = coup.j;
-			System.out.println("Pos Coup = (" + i + "," + j + ")");
-			grid[i][j] = this.activePlayer;
-			int nbPiecesRetournees = 0;
-			//Traitement vertical (Bas)
+			//System.out.println("Test" + j);
 			j++;
-			while(j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
-				{
-				//System.out.println("Test" + j);
-				j++;
-				}
+			}
 
-			if (j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
+		if (j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
+			{
+			for(int j2 = coup.j + 1; j2 < j; j2++)
 				{
-				for(int j2 = coup.j + 1; j2 < j; j2++)
-					{
-					grid[i][j2] = this.activePlayer;
-					System.out.println("VB> (" + i + "," + j2 + ")");
-					nbPiecesRetournees++;
-					//				if (this.joueurActif == K_BLEU)
-					//
-					}
+				grid[i][j2] = this.activePlayer;
+				System.out.println("VB> (" + i + "," + j2 + ")");
+				nbPiecesRetournees++;
+				//				if (this.joueurActif == K_BLEU)
+				//
 				}
+			}
 
-			//Traitement vertical (Haut)
-			j = coup.j - 1;
-			while(j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
+		//Traitement vertical (Haut)
+		j = coup.j - 1;
+		while(j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
+			{
+			j--;
+			}
+
+		if (j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
+			{
+			for(int j2 = coup.j - 1; j2 > j; j2--)
 				{
-				j--;
+				grid[i][j2] = this.activePlayer;
+				System.out.println("VH> (" + i + "," + j2 + ")");
+				nbPiecesRetournees++;
 				}
+			}
 
-			if (j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
+		//Traitement horizontal (Gauche)
+		j = coup.j;
+		i = coup.i - 1;
+		while(i < 8 && i >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
+			{
+			i--;
+			}
+
+		if (i < 8 && i >= 0 && grid[i][j] == this.activePlayer)
+			{
+			for(int i2 = coup.i - 1; i2 > i; i2--)
 				{
-				for(int j2 = coup.j - 1; j2 > j; j2--)
-					{
-					grid[i][j2] = this.activePlayer;
-					System.out.println("VH> (" + i + "," + j2 + ")");
-					nbPiecesRetournees++;
-					}
+				grid[i2][j] = this.activePlayer;
+				System.out.println("HG> (" + i2 + "," + j + ")");
+				nbPiecesRetournees++;
 				}
+			}
 
-			//Traitement horizontal (Gauche)
-			j = coup.j;
-			i = coup.i - 1;
-			while(i < 8 && i >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
+		//Traitement horizontal (Droite)
+		i = coup.i + 1;
+		while(i < 8 && i >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
+			{
+			i++;
+			}
+
+		if (i < 8 && i >= 0 && grid[i][j] == this.activePlayer)
+			{
+			for(int i2 = coup.i + 1; i2 < i; i2++)
 				{
-				i--;
+				grid[i2][j] = this.activePlayer;
+				System.out.println("HD> (" + i2 + "," + j + ")");
+				nbPiecesRetournees++;
 				}
+			}
 
-			if (i < 8 && i >= 0 && grid[i][j] == this.activePlayer)
+		//Traitement Diagonal (Bas,Droite)
+		i = coup.i + 1;
+		j = coup.j + 1;
+		while(i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
+			{
+			i++;
+			j++;
+			}
+
+		if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
+			{
+			nbPiecesRetournees--;
+			int cpt = 0;
+			while(coup.i + cpt < i)
 				{
-				for(int i2 = coup.i - 1; i2 > i; i2--)
-					{
-					grid[i2][j] = this.activePlayer;
-					System.out.println("HG> (" + i2 + "," + j + ")");
-					nbPiecesRetournees++;
-					}
+				grid[coup.i + cpt][coup.j + cpt] = this.activePlayer;
+				System.out.println("DBD> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
+				cpt++;
+				nbPiecesRetournees++;
 				}
+			}
 
-			//Traitement horizontal (Droite)
-			i = coup.i + 1;
-			while(i < 8 && i >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
+		//Traitement Diagonal (Haut,Gauche)
+		i = coup.i - 1;
+		j = coup.j - 1;
+		while(i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
+			{
+			i--;
+			j--;
+			}
+
+		if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
+			{
+			nbPiecesRetournees--;
+			int cpt = 0;
+			while(coup.i + cpt > i)
 				{
-				i++;
+				grid[coup.i + cpt][coup.j + cpt] = this.activePlayer;
+				System.out.println("DHG> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
+				cpt--;
+				nbPiecesRetournees++;
 				}
+			}
 
-			if (i < 8 && i >= 0 && grid[i][j] == this.activePlayer)
+		//Traitement Diagonal (Haut,Droite)
+		i = coup.i + 1;
+		j = coup.j - 1;
+		while(i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
+			{
+			i++;
+			j--;
+			}
+
+		if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
+			{
+			nbPiecesRetournees--;
+			int cpt = 0;
+			while(coup.i + cpt > i)
 				{
-				for(int i2 = coup.i + 1; i2 < i; i2++)
-					{
-					grid[i2][j] = this.activePlayer;
-					System.out.println("HD> (" + i2 + "," + j + ")");
-					nbPiecesRetournees++;
-					}
+				grid[coup.i + cpt][coup.j - cpt] = this.activePlayer;
+				System.out.println("DHD> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
+				cpt++;
+				nbPiecesRetournees++;
 				}
+			}
 
-			//Traitement Diagonal (Bas,Droite)
-			i = coup.i + 1;
-			j = coup.j + 1;
-			while(i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
+		//Traitement Diagonal (Bas,Gauche)
+		i = coup.i - 1;
+		j = coup.j + 1;
+		while(i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
+			{
+			i--;
+			j++;
+			}
+
+		if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
+			{
+			nbPiecesRetournees--;
+			int cpt = 0;
+			while(coup.i + cpt > i)
 				{
-				i++;
-				j++;
+				grid[coup.i + cpt][coup.j - cpt] = this.activePlayer;
+				System.out.println("DBD> (" + (coup.i + cpt) + "," + (coup.i - cpt) + ")");
+				nbPiecesRetournees++;
+				cpt--;
 				}
+			}
 
-			if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
-				{
-				nbPiecesRetournees--;
-				int cpt = 0;
-				while(coup.i + cpt < i)
-					{
-					grid[coup.i + cpt][coup.j + cpt] = this.activePlayer;
-					System.out.println("DBD> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
-					cpt++;
-					nbPiecesRetournees++;
-					}
-				}
+		//System.out.println("Pions retournés:" + nbPiecesRetournees);
 
-			//Traitement Diagonal (Haut,Gauche)
-			i = coup.i - 1;
-			j = coup.j - 1;
-			while(i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
-				{
-				i--;
-				j--;
-				}
-
-			if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
-				{
-				nbPiecesRetournees--;
-				int cpt = 0;
-				while(coup.i + cpt > i)
-					{
-					grid[coup.i + cpt][coup.j + cpt] = this.activePlayer;
-					System.out.println("DHG> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
-					cpt--;
-					nbPiecesRetournees++;
-					}
-				}
-
-			//Traitement Diagonal (Haut,Droite)
-			i = coup.i + 1;
-			j = coup.j - 1;
-			while(i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
-				{
-				i++;
-				j--;
-				}
-
-			if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
-				{
-				nbPiecesRetournees--;
-				int cpt = 0;
-				while(coup.i + cpt > i)
-					{
-					grid[coup.i + cpt][coup.j - cpt] = this.activePlayer;
-					System.out.println("DHD> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
-					cpt++;
-					nbPiecesRetournees++;
-					}
-				}
-
-			//Traitement Diagonal (Bas,Gauche)
-			i = coup.i - 1;
-			j = coup.j + 1;
-			while(i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
-				{
-				i--;
-				j++;
-				}
-
-			if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
-				{
-				nbPiecesRetournees--;
-				int cpt = 0;
-				while(coup.i + cpt > i)
-					{
-					grid[coup.i + cpt][coup.j - cpt] = this.activePlayer;
-					System.out.println("DBD> (" + (coup.i + cpt) + "," + (coup.i - cpt) + ")");
-					nbPiecesRetournees++;
-					cpt--;
-					}
-				}
-
-			//System.out.println("Pions retournés:" + nbPiecesRetournees);
-
-			// Mise à jour du nombre de pions de chaque joueur
-			if (this.activePlayer == K_BLUE)
-				{
-				bluePiecesNb += nbPiecesRetournees + 1;
-				redPiecesNb -= nbPiecesRetournees;
-				}
-			else
-				{
-				bluePiecesNb -= nbPiecesRetournees;
-				redPiecesNb += nbPiecesRetournees + 1;
-				}
-			//System.out.println("Pions bleu=" + bluePiecesNb + "/ rouge =" + redPiecesNb);
-			System.out.println("********");
-			}*/
-
+		// Mise à jour du nombre de pions de chaque joueur
+		if (this.activePlayer == K_BLUE)
+			{
+			bluePiecesNb += nbPiecesRetournees + 1;
+			redPiecesNb -= nbPiecesRetournees;
+			}
+		else
+			{
+			bluePiecesNb -= nbPiecesRetournees;
+			redPiecesNb += nbPiecesRetournees + 1;
+			}
+		//System.out.println("Pions bleu=" + bluePiecesNb + "/ rouge =" + redPiecesNb);
+		System.out.println("********");
+		}*/
 
 	public ArrayList<Position> findPlayerPieces()
 		{
@@ -369,7 +375,6 @@ public class Board
 			}
 		return playerPieces;
 		}
-
 
 	public ArrayList<Position> findAvailableMoves()
 		{
@@ -391,12 +396,10 @@ public class Board
 		return operatorsAvailable;
 		}
 
-
 	public Board getNextBoard()
 		{
 		return new Board(this, null);//1 - this.activePlayer);
 		}
-
 
 	public void displayBoard()
 		{
@@ -418,7 +421,6 @@ public class Board
 		System.out.println();
 		}
 
-
 	// IMPORTANT METHODS
 	public Board applyOp(Position move)
 		{
@@ -426,18 +428,260 @@ public class Board
 		return new Board(this, move);
 		}
 
-
 	public boolean isFinal()
 		{
 		return (this.findAvailableMoves().isEmpty() || this.emptyCaseNb() == 0);
 		}
 
-
 	public int evalBoard()
 		{
-		// TODO Auto-generated method stub
-		// Evaluate the current state of the board
-		return 1;//(int)(Math.random() * 100);
+		// TODO: stabilité des pièces > très efficace
+		int scoreEval = 0;
+		int adversaire = 1 - owner;
+		int nbPiecesIA, nbPiecesJoueur;
+		//System.out.println("OWNER = " + owner);
+		if (owner == K_BLUE)
+			{
+			nbPiecesIA = bluePiecesNb;
+			nbPiecesJoueur = redPiecesNb;
+			}
+		else
+			{
+			nbPiecesIA = redPiecesNb;
+			nbPiecesJoueur = bluePiecesNb;
+			}
+
+		//Si partie terminée
+		if (bluePiecesNb + redPiecesNb >= 64)
+			{
+			if (nbPiecesIA > nbPiecesJoueur)
+				{
+				scoreEval += 1000;
+				}
+			else
+				{
+				scoreEval -= 1000;
+				}
+			}
+
+		//Si début de partie
+		if (bluePiecesNb + redPiecesNb <= 15)
+			{
+			if (nbPiecesIA < nbPiecesJoueur)
+				{
+				scoreEval += 5;
+				}
+			else
+				{
+				scoreEval -= 5;
+				}
+			}
+
+		//Si owner possède des pions dans les bords
+		for(int i = 0; i < 8; i++)
+			{
+			if (this.grid[i][0] == owner)
+				{
+				scoreEval += 10;
+				}
+			else if (this.grid[i][0] == adversaire)
+				{
+				scoreEval -= 10;
+				}
+			}
+
+		for(int i = 0; i < 8; i++)
+			{
+			if (this.grid[0][i] == owner)
+				{
+				scoreEval += 10;
+				}
+			else if (this.grid[i][0] == adversaire)
+				{
+				scoreEval -= 10;
+				}
+			}
+
+		for(int i = 0; i < 8; i++)
+			{
+			if (this.grid[i][7] == owner)
+				{
+				scoreEval += 10;
+				}
+			else if (this.grid[i][0] == adversaire)
+				{
+				scoreEval -= 10;
+				}
+			}
+
+		for(int i = 0; i < 8; i++)
+			{
+			if (this.grid[7][i] == owner)
+				{
+				scoreEval += 10;
+				}
+			else if (this.grid[i][0] == adversaire)
+				{
+				scoreEval -= 10;
+				}
+			}
+
+		//Si owner possède des cases centrales
+		if (this.grid[3][3] == owner)
+			{
+			scoreEval += 25;
+			}
+		if (this.grid[3][4] == owner)
+			{
+			scoreEval += 25;
+			}
+		if (this.grid[4][3] == owner)
+			{
+			scoreEval += 25;
+			}
+		if (this.grid[4][4] == owner)
+			{
+			scoreEval += 25;
+			}
+
+		//Si adversaire possède des cases centrales
+		if (this.grid[3][3] == adversaire)
+			{
+			scoreEval -= 25;
+			}
+		if (this.grid[3][4] == adversaire)
+			{
+			scoreEval -= 25;
+			}
+		if (this.grid[4][3] == adversaire)
+			{
+			scoreEval -= 25;
+			}
+		if (this.grid[4][4] == adversaire)
+			{
+			scoreEval -= 25;
+			}
+
+		//Si owner possède des cases en coins
+		if (this.grid[0][0] == owner)
+			{
+			scoreEval += 50;
+			}
+		if (this.grid[0][7] == owner)
+			{
+			scoreEval += 50;
+			}
+		if (this.grid[7][0] == owner)
+			{
+			scoreEval += 50;
+			}
+		if (this.grid[7][7] == owner)
+			{
+			scoreEval += 50;
+			}
+
+		//Si adversaire possède des cases en coins
+		if (this.grid[0][0] == adversaire)
+			{
+			scoreEval -= 50;
+			}
+		if (this.grid[0][7] == adversaire)
+			{
+			scoreEval -= 50;
+			}
+		if (this.grid[7][0] == adversaire)
+			{
+			scoreEval -= 50;
+			}
+		if (this.grid[7][7] == adversaire)
+			{
+			scoreEval -= 50;
+			}
+
+		//Si owner possède 3 cases dans les coins
+		if (this.grid[0][0] == owner && this.grid[1][0] == owner && this.grid[0][1] == owner)
+			{
+			scoreEval += 100;
+			}
+		if (this.grid[0][7] == owner && this.grid[1][7] == owner && this.grid[0][6] == owner)
+			{
+			scoreEval += 100;
+			}
+		if (this.grid[7][0] == owner && this.grid[7][1] == owner && this.grid[6][0] == owner)
+			{
+			scoreEval += 100;
+			}
+		if (this.grid[7][7] == owner && this.grid[7][6] == owner && this.grid[6][7] == owner)
+			{
+			scoreEval += 100;
+			}
+
+		//Si Joueur possède 3 cases dans les coins
+		if (this.grid[0][0] == adversaire && this.grid[1][0] == adversaire && this.grid[0][1] == adversaire)
+			{
+			scoreEval -= 100;
+			}
+
+		if (this.grid[0][7] == adversaire && this.grid[1][7] == adversaire && this.grid[0][6] == adversaire)
+			{
+			scoreEval -= 100;
+			}
+
+		if (this.grid[7][0] == adversaire && this.grid[7][1] == adversaire && this.grid[6][0] == adversaire)
+			{
+			scoreEval -= 100;
+			}
+
+		if (this.grid[7][7] == adversaire && this.grid[7][6] == adversaire && this.grid[6][7] == adversaire)
+			{
+			scoreEval -= 100;
+			}
+
+		//Si owner possède 4 cases dans les coins
+		if (this.grid[0][0] == owner && this.grid[1][0] == owner && this.grid[0][1] == owner && this.grid[1][1] == owner)
+			{
+			scoreEval += 150;
+			}
+
+		if (this.grid[0][7] == owner && this.grid[1][7] == owner && this.grid[0][6] == owner && this.grid[1][6] == owner)
+			{
+			scoreEval += 150;
+			}
+
+		if (this.grid[7][0] == owner && this.grid[7][1] == owner && this.grid[6][0] == owner && this.grid[6][1] == owner)
+			{
+			scoreEval += 150;
+			}
+
+		if (this.grid[7][7] == owner && this.grid[7][6] == owner && this.grid[6][7] == owner && this.grid[6][6] == owner)
+			{
+			scoreEval += 150;
+			}
+
+		//Si Joueur possède 4 cases dans les coins
+		if (this.grid[0][0] == adversaire && this.grid[1][0] == adversaire && this.grid[0][1] == adversaire && this.grid[1][1] == adversaire)
+			{
+			scoreEval -= 150;
+			}
+
+		if (this.grid[0][7] == adversaire && this.grid[1][7] == adversaire && this.grid[0][6] == adversaire && this.grid[1][6] == adversaire)
+			{
+			scoreEval -= 150;
+			}
+
+		if (this.grid[7][0] == adversaire && this.grid[7][1] == adversaire && this.grid[6][0] == adversaire && this.grid[6][1] == adversaire)
+			{
+			scoreEval -= 150;
+			}
+
+		if (this.grid[7][7] == adversaire && this.grid[7][6] == adversaire && this.grid[6][7] == adversaire && this.grid[6][6] == adversaire)
+			{
+			scoreEval -= 150;
+			}
+
+		//System.out.println("VAL="+scoreEval);
+		return scoreEval;
+
 		}
 
 	/*------------------------------------------------------------------*\

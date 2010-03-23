@@ -25,7 +25,8 @@ public class Joueur extends Othello.Joueur
 	public Joueur(int depth, int playerID)
 		{
 		super();
-		rootBoard = new Board(1-playerID, 2, 2, 0);
+		rootBoard = new Board(1-playerID);
+
 		this.depth = depth;
 		}
 
@@ -71,7 +72,9 @@ public class Joueur extends Othello.Joueur
 			int j = stdin.nextInt();
 			result = new Move(i, j);
 			}*/
-		Position tmp1 = alphabeta(rootBoard, depth, 1, rootBoard.evalBoard()).getPosition();
+		AlphaBetaReturnValues tmp2 = alphabeta(rootBoard, depth, 1, rootBoard.evalBoard());
+		Position tmp1 = tmp2.getPosition();
+		System.out.println("Eval="+tmp2.getEvalValue());
 		rootBoard = rootBoard.applyOp(tmp1);
 
 

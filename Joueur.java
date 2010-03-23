@@ -25,7 +25,7 @@ public class Joueur extends Othello.Joueur
 	public Joueur(int depth, int playerID)
 		{
 		super();
-		rootBoard = new Board(playerID, 2, 2, 0);
+		rootBoard = new Board(1-playerID, 2, 2, 0);
 		this.depth = depth;
 		}
 
@@ -53,8 +53,8 @@ public class Joueur extends Othello.Joueur
 			}
 		else
 			{
-			System.out.println("No move available");
-			//rootBoard = rootBoard.getNextBoard();
+			System.out.println("******No move available");
+			rootBoard = rootBoard.applyOp(null);
 			}
 		//int das = stdin.nextInt();
 
@@ -73,15 +73,16 @@ public class Joueur extends Othello.Joueur
 			}*/
 		Position tmp1 = alphabeta(rootBoard, depth, 1, rootBoard.evalBoard()).getPosition();
 		rootBoard = rootBoard.applyOp(tmp1);
-		System.out.println(">> NEXT MOVE = (" + tmp1.i + "," + tmp1.j + ")");
-		rootBoard.displayBoard();
+
 
 		if (tmp1 == null)
 			{
-			return new Move(-1, -1);
+			return null;
 			}
 		else
 			{
+			System.out.println(">> NEXT MOVE = (" + tmp1.i + "," + tmp1.j + ")");
+			rootBoard.displayBoard();
 			return tmp1.toMove();
 			}
 		}

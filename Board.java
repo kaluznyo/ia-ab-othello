@@ -30,7 +30,7 @@ public class Board
 		this.eval = evalBoard();
 		}
 
-	public Board(Board board, int activePlayer)
+	/*public Board(Board board, int activePlayer)
 		{
 		this(activePlayer, board.bluePiecesNb, board.redPiecesNb, board.movesPlayed);
 		for(int i = 0; i < 8; i++)
@@ -38,7 +38,7 @@ public class Board
 			System.arraycopy(board.grid[i], 0, this.grid[i], 0, 8);
 			}
 		}
-
+*/
 	public Board(Board plateau)
 		{
 		this(plateau.activePlayer, plateau.bluePiecesNb, plateau.redPiecesNb, plateau.movesPlayed);
@@ -51,8 +51,10 @@ public class Board
 	public Board(Board oldState, Position move)
 		{
 		this(oldState);
-
-		this.updateBoard(move);
+		if (move != null)
+			{
+				this.updateBoard(move);
+				}
 
 		this.activePlayer = 1 - this.activePlayer;
 		}
@@ -392,7 +394,7 @@ public class Board
 
 	public Board getNextBoard()
 		{
-		return new Board(this, 1 - this.activePlayer);
+		return new Board(this, null);//1 - this.activePlayer);
 		}
 
 

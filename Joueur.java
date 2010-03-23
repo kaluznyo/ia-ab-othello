@@ -17,14 +17,16 @@ import Othello.Move;
 public class Joueur extends Othello.Joueur
 	{
 
-	private Board rootBoard;
+	public Board rootBoard;
+	private int depth;
 
 	// depth: profondeur alpha-beta
 	// playerID: 0 = rouge, 1 = bleu
 	public Joueur(int depth, int playerID)
 		{
 		super();
-		rootBoard = new Board(1, 2, 2, 0);
+		rootBoard = new Board(playerID, 2, 2, 0);
+		this.depth = depth;
 		}
 
 	Scanner stdin = new Scanner(System.in);
@@ -38,14 +40,30 @@ public class Joueur extends Othello.Joueur
 		// - Remettre à jour votre représentation du jeu
 		// - Retourner le coup choisi
 		// Mais ici, on se contente de lire à la console:
-		Move result = null;
-		rootBoard.applyOp(move);
+
 		if (move != null)
 			{
-			System.out.println("Coup adverse: " + move.i + ", " + move.j);
+			System.out.println("MOVE" + move);
+			Position tmp = new Position(move);
+			System.out.println(">> BEFORE UPDATE/ Move = (" + move.i + "," + move.j + ")");
+			rootBoard.displayBoard();
+			rootBoard = rootBoard.applyOp(tmp);
+			System.out.println(">> AFTER UPDATE");
+			rootBoard.displayBoard();
 			}
-		System.out.println("Votre coup: ");
-		System.out.print("Colonne (-1 si aucun coup possible): ");
+		else
+			{
+			System.out.println("No move available");
+			//rootBoard = rootBoard.getNextBoard();
+			}
+		//int das = stdin.nextInt();
+
+		//		if (move != null)
+		//			{
+		//			System.out.println("Coup adverse: " + move.i + ", " + move.j);
+		//			}
+		//		System.out.println("Votre coup: ");
+		//		System.out.print("Colonne (-1 si aucun coup possible): ");
 		/*int i = stdin.nextInt();
 		if (i != -1)
 			{
@@ -53,8 +71,19 @@ public class Joueur extends Othello.Joueur
 			int j = stdin.nextInt();
 			result = new Move(i, j);
 			}*/
+		Position tmp1 = alphabeta(rootBoard, depth, 1, rootBoard.evalBoard()).getPosition();
+		rootBoard = rootBoard.applyOp(tmp1);
+		System.out.println(">> NEXT MOVE = (" + tmp1.i + "," + tmp1.j + ")");
+		rootBoard.displayBoard();
 
-		return alphabeta(rootBoard, 5, rootBoard, rootBoard.evalBoard()).getMove();//result;
+		if (tmp1 == null)
+			{
+			return new Move(-1, -1);
+			}
+		else
+			{
+			return tmp1.toMove();
+			}
 		}
 
 	// minormax = 1: maximize
@@ -68,19 +97,19 @@ public class Joueur extends Othello.Joueur
 			return new AlphaBetaReturnValues(null, root.evalBoard());
 			}
 		int optVal = minormax * -Integer.MIN_VALUE;
-		Move optOp = null;
+		Position optOp = null;
 
-		for(Move op:root.findAvailableMoves())
+		for(Position op:root.findAvailableMoves())
 			{
-			Board newState = new Board(root, op);
+			Board newState = root.applyOp(op);
 			AlphaBetaReturnValues returnValues;
-			returnValues = alphabeta(newState, depth-1, -minormax, optVal);
+			returnValues = alphabeta(newState, depth - 1, -minormax, optVal);
 
-			if (returnValues.getEvalValue()*minormax > optVal * minormax)
+			if (returnValues.getEvalValue() * minormax > optVal * minormax)
 				{
 				optVal = returnValues.getEvalValue();
-				optOp = returnValues.getMove();
-				if (optVal*minormax > parentValue * minormax)
+				optOp = op;
+				if (optVal * minormax > parentValue * minormax)
 					{
 					break;
 					}

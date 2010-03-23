@@ -1,18 +1,47 @@
 
 package Participants.FroidevauxKaluznyNeuhaus;
 
-public final class AlphaBetaReturnValues
+import Othello.Move;
+
+public class Position
 	{
+
+	public int i, j;
+
 	/*------------------------------------------------------------------*\
 	|*							Constructeurs							*|
 	\*------------------------------------------------------------------*/
-	public AlphaBetaReturnValues(Position move, int evalValue)
+	public Position(int i, int j)
 		{
 		super();
-		this.move = move;
-		this.evalValue = evalValue;
+		this.i = i;
+		this.j = j;
 		}
 
+	public Position(Move move)
+		{
+		super();
+		this.i = move.j;
+		this.j = move.i;
+		}
+
+	@Override public boolean equals(Object obj)
+		{
+		// TODO Auto-generated method stub
+		Position tmp = (Position)obj;
+		return (tmp.i == this.i) && (tmp.j == this.j);
+		}
+
+	private boolean isEqual(Position pos)
+		{
+		return (pos.i == this.i) && (pos.j == this.j);
+		}
+
+
+	public Move toMove()
+		{
+		return new Move(this.j, this.i);
+		}
 	/*------------------------------------------------------------------*\
 	|*							Methodes Public							*|
 	\*------------------------------------------------------------------*/
@@ -20,28 +49,10 @@ public final class AlphaBetaReturnValues
 	/*------------------------------*\
 	|*				Set				*|
 	\*------------------------------*/
-//	public void setMove(Move move)
-//		{
-//		this.move = move;
-//		}
-//
-//	public void setEvalValue(int evalValue)
-//		{
-//		this.evalValue = evalValue;
-//		}
 
 	/*------------------------------*\
 	|*				Get				*|
 	\*------------------------------*/
-	public Position getPosition()
-		{
-		return this.move;
-		}
-
-	public int getEvalValue()
-		{
-		return this.evalValue;
-		}
 
 	/*------------------------------------------------------------------*\
 	|*							Methodes Private						*|
@@ -50,6 +61,4 @@ public final class AlphaBetaReturnValues
 	/*------------------------------------------------------------------*\
 	|*							Attributs Private						*|
 	\*------------------------------------------------------------------*/
-	private final Position move;
-	private final int evalValue;
 	}

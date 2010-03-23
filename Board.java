@@ -35,7 +35,7 @@ public class Board
 
 	public Board(int activePlayer)
 		{
-		this(activePlayer, 2, 2, 0, 1-activePlayer);
+		this(activePlayer, 2, 2, 0, 1 - activePlayer);
 		}
 
 	/*public Board(Board board, int activePlayer)
@@ -53,6 +53,10 @@ public class Board
 		for(int i = 0; i < 8; i++)
 			{
 			System.arraycopy(plateau.grid[i], 0, this.grid[i], 0, 8);
+			}
+		for(int i = 0; i < 8; i++)
+			{
+			System.arraycopy(plateau.stableGrid[i], 0, this.stableGrid[i], 0, 8);
 			}
 		}
 
@@ -172,192 +176,6 @@ public class Board
 		return availableMoves;
 		}
 
-	// Met à jour la grille à partir du coup joué
-	/*public void updateBoard(Position coup)
-		{
-		//Move coup = new Move(coup1.j, coup1.i);
-		int i = coup.i;
-		int j = coup.j;
-		System.out.println("Pos Coup = (" + i + "," + j + ")");
-		grid[i][j] = this.activePlayer;
-		int nbPiecesRetournees = 0;
-		//Traitement vertical (Bas)
-		j++;
-		while(j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
-			{
-			//System.out.println("Test" + j);
-			j++;
-			}
-
-		if (j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
-			{
-			for(int j2 = coup.j + 1; j2 < j; j2++)
-				{
-				grid[i][j2] = this.activePlayer;
-				System.out.println("VB> (" + i + "," + j2 + ")");
-				nbPiecesRetournees++;
-				//				if (this.joueurActif == K_BLEU)
-				//
-				}
-			}
-
-		//Traitement vertical (Haut)
-		j = coup.j - 1;
-		while(j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
-			{
-			j--;
-			}
-
-		if (j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
-			{
-			for(int j2 = coup.j - 1; j2 > j; j2--)
-				{
-				grid[i][j2] = this.activePlayer;
-				System.out.println("VH> (" + i + "," + j2 + ")");
-				nbPiecesRetournees++;
-				}
-			}
-
-		//Traitement horizontal (Gauche)
-		j = coup.j;
-		i = coup.i - 1;
-		while(i < 8 && i >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
-			{
-			i--;
-			}
-
-		if (i < 8 && i >= 0 && grid[i][j] == this.activePlayer)
-			{
-			for(int i2 = coup.i - 1; i2 > i; i2--)
-				{
-				grid[i2][j] = this.activePlayer;
-				System.out.println("HG> (" + i2 + "," + j + ")");
-				nbPiecesRetournees++;
-				}
-			}
-
-		//Traitement horizontal (Droite)
-		i = coup.i + 1;
-		while(i < 8 && i >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
-			{
-			i++;
-			}
-
-		if (i < 8 && i >= 0 && grid[i][j] == this.activePlayer)
-			{
-			for(int i2 = coup.i + 1; i2 < i; i2++)
-				{
-				grid[i2][j] = this.activePlayer;
-				System.out.println("HD> (" + i2 + "," + j + ")");
-				nbPiecesRetournees++;
-				}
-			}
-
-		//Traitement Diagonal (Bas,Droite)
-		i = coup.i + 1;
-		j = coup.j + 1;
-		while(i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
-			{
-			i++;
-			j++;
-			}
-
-		if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
-			{
-			nbPiecesRetournees--;
-			int cpt = 0;
-			while(coup.i + cpt < i)
-				{
-				grid[coup.i + cpt][coup.j + cpt] = this.activePlayer;
-				System.out.println("DBD> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
-				cpt++;
-				nbPiecesRetournees++;
-				}
-			}
-
-		//Traitement Diagonal (Haut,Gauche)
-		i = coup.i - 1;
-		j = coup.j - 1;
-		while(i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
-			{
-			i--;
-			j--;
-			}
-
-		if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
-			{
-			nbPiecesRetournees--;
-			int cpt = 0;
-			while(coup.i + cpt > i)
-				{
-				grid[coup.i + cpt][coup.j + cpt] = this.activePlayer;
-				System.out.println("DHG> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
-				cpt--;
-				nbPiecesRetournees++;
-				}
-			}
-
-		//Traitement Diagonal (Haut,Droite)
-		i = coup.i + 1;
-		j = coup.j - 1;
-		while(i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
-			{
-			i++;
-			j--;
-			}
-
-		if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
-			{
-			nbPiecesRetournees--;
-			int cpt = 0;
-			while(coup.i + cpt > i)
-				{
-				grid[coup.i + cpt][coup.j - cpt] = this.activePlayer;
-				System.out.println("DHD> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
-				cpt++;
-				nbPiecesRetournees++;
-				}
-			}
-
-		//Traitement Diagonal (Bas,Gauche)
-		i = coup.i - 1;
-		j = coup.j + 1;
-		while(i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
-			{
-			i--;
-			j++;
-			}
-
-		if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
-			{
-			nbPiecesRetournees--;
-			int cpt = 0;
-			while(coup.i + cpt > i)
-				{
-				grid[coup.i + cpt][coup.j - cpt] = this.activePlayer;
-				System.out.println("DBD> (" + (coup.i + cpt) + "," + (coup.i - cpt) + ")");
-				nbPiecesRetournees++;
-				cpt--;
-				}
-			}
-
-		//System.out.println("Pions retournés:" + nbPiecesRetournees);
-
-		// Mise à jour du nombre de pions de chaque joueur
-		if (this.activePlayer == K_BLUE)
-			{
-			bluePiecesNb += nbPiecesRetournees + 1;
-			redPiecesNb -= nbPiecesRetournees;
-			}
-		else
-			{
-			bluePiecesNb -= nbPiecesRetournees;
-			redPiecesNb += nbPiecesRetournees + 1;
-			}
-		//System.out.println("Pions bleu=" + bluePiecesNb + "/ rouge =" + redPiecesNb);
-		System.out.println("********");
-		}*/
-
 	public ArrayList<Position> findPlayerPieces()
 		{
 		ArrayList<Position> playerPieces = new ArrayList<Position>();
@@ -392,7 +210,7 @@ public class Board
 					}
 				}
 			}
-
+		//coupsPossibles = new ArrayList<Position>(operatorsAvailable);
 		return operatorsAvailable;
 		}
 
@@ -421,10 +239,31 @@ public class Board
 		System.out.println();
 		}
 
+	public void displayStableGrid()
+		{
+		for(int i = 0; i < 8; i++)
+			{
+			for(int j = 0; j < 8; j++)
+				{
+				if (this.stableGrid[i][j] == K_EMPTY)
+					{
+					System.out.print("x ");
+					}
+				else
+					{
+					System.out.print(this.stableGrid[i][j] + " ");
+					}
+				}
+			System.out.println();
+			}
+		System.out.println();
+		}
+
 	// IMPORTANT METHODS
 	public Board applyOp(Position move)
 		{
 		// return a new board with the move applied
+		movesPlayed++;
 		return new Board(this, move);
 		}
 
@@ -436,9 +275,240 @@ public class Board
 	public int evalBoard()
 		{
 		// TODO: stabilité des pièces > très efficace
+
+		// RECHERCHE DES PIONS DEFINITIFS
+		// Pour chaque pions sur le plateau
+		/*
+		coupsPossibles = findAvailableMoves();
+		if (movesPlayed > 0)
+			{
+			if (coupsPossibles != null)
+				{
+				for(Position pos:coupsPossibles)
+					{
+					int posI = pos.i;
+					int posJ = pos.j;
+
+					int stable[] = new int[4];
+
+					// Si le coup est déjà stable, on ne fait rien
+					if (stableGrid[pos.i][pos.j] == K_EMPTY)
+						{
+						// Si le pion se trouve dans un coin
+						if (posI == 0 && posJ == 0 || posI == 7 && posJ == 0 || posI == 0 && posJ == 7 || posI == 7 && posJ == 7)
+							{
+							if (grid[posI][posJ] == owner)
+								{
+								stableGrid[posI][posJ] = 1;
+								}
+							else
+								{
+								stableGrid[posI][posJ] = -1;
+								}
+							}
+						else
+							{
+							// Variation de i
+							//for(int angleI = -1; angleI <= 1; angleI++)
+								{
+								// variation de j
+								//for(int angleJ = -1; angleJ <= 1; angleJ++)
+									{
+									// On ne prend pas en compte le cas ou i et j sont nuls
+									//if (!(angleI == 0 && angleJ == 0))
+										{
+
+										/******* HORIZONTAL ******** /
+										int cpt = 0;
+										// Parcours droit
+										while(posI + cpt <= 7 && posI + cpt > 0 && grid[posI + cpt][posJ] == owner)
+											{
+											//
+											cpt++;
+											}
+
+										if (posI + cpt >= 8)
+											{
+											stable[0] = 1;
+											}
+										else
+											{
+											int tmp = grid[posI + cpt][posJ];
+
+											// Parcours dans l'autre sens en cherchant le complémentaire (vide ou case adverse)
+											// Parcours gauche
+											cpt = 0;
+											while(posI + cpt < 8 && posI + cpt > 0 && grid[posI + cpt][posJ] == owner)
+												{
+												cpt--;
+												}
+											if (posI + cpt < 0)
+												{
+												// PION DEFINITIF sur l'horizontal
+												stable[0] = 1;
+												}
+											else
+												{
+												if (tmp == K_EMPTY && (grid[posI + cpt][posJ] != 1 - owner || grid[posI + cpt][posJ] != K_EMPTY) || tmp == 1 - owner && grid[posI + cpt][posJ] != K_EMPTY)
+													{
+													stable[0] = 1;
+													}
+												}
+											}
+
+
+
+
+
+										/********* VERTICAL ********** /
+										cpt = 0;
+										// Parcours droit
+										while(posJ + cpt < 8 && posJ + cpt >= 0 && grid[posI][posJ + cpt] == owner)
+											{
+											//
+											cpt++;
+											}
+										if (posJ + cpt >= 8)
+											{
+											stable[1] = 1;
+											}
+										else
+											{
+											int tmp = grid[posI][posJ + cpt];
+
+											// Parcours dans l'autre sens en cherchant le complémentaire (vide ou case adverse)
+											// Parcours gauche
+											cpt = 0;
+											while(posJ + cpt < 8 && posJ + cpt >= 0 && grid[posI][posJ + cpt] == owner)
+												{
+												cpt--;
+												}
+											if (posJ + cpt < 0)
+												{
+												// PION DEFINITIF sur l'horizontal
+												stable[1] = 1;
+												}
+											else
+												{
+												if (tmp == K_EMPTY && grid[posI][posJ + cpt] != 1 - owner || tmp == 1 - owner && grid[posI][posJ + cpt] != K_EMPTY)
+													{
+													stable[1] = 1;
+													}
+												}
+											}
+
+
+
+
+										/********* DIAGO BAS ********** /
+										cpt = 0;
+										// Parcours droit
+										while(posI + cpt < 8 && posI + cpt >= 0 && posJ + cpt < 8 && posJ + cpt >= 0 && grid[posI + cpt][posJ + cpt] == owner)
+											{
+											//
+											cpt++;
+											}
+										if (posJ + cpt >= 8 || posI + cpt >= 8)
+											{
+											stable[2] = 1;
+											}
+										else
+											{
+											int tmp = grid[posI + cpt][posJ + cpt];
+
+											// Parcours dans l'autre sens en cherchant le complémentaire (vide ou case adverse)
+											// Parcours gauche
+											cpt = 0;
+											while(posI + cpt < 8 && posI + cpt >= 0 && posJ + cpt < 8 && posJ + cpt >= 0 && grid[posI + cpt][posJ + cpt] == owner)
+												{
+												cpt--;
+												}
+											if (posJ + cpt < 0 && posI + cpt < 0)
+												{
+												// PION DEFINITIF sur l'horizontal
+												stable[2] = 1;
+												}
+											else
+												{
+												if (tmp == K_EMPTY && grid[posI+cpt][posJ + cpt] != 1 - owner || tmp == 1 - owner && grid[posI+cpt][posJ + cpt] != K_EMPTY)
+													{
+													stable[2] = 1;
+													}
+												}
+											}
+
+
+
+										/********* DIAGO HAUT ********** /
+										cpt = 0;
+										// Parcours droit
+										while(posI + cpt < 7 && posI + cpt > 0 && posJ - cpt < 7 && posJ - cpt > 0 && grid[posI + cpt][posJ - cpt] == owner)
+											{
+											//
+											cpt++;
+											}
+										if (posJ + cpt >= 8 || posI + cpt < 0)
+											{
+											stable[3] = 1;
+											}
+										else
+											{
+											//System.out.println("POS DH ("+ posI +","+posJ+") +cpt="+cpt);
+											int tmp = grid[posI + cpt][posJ - cpt];
+
+											// Parcours dans l'autre sens en cherchant le complémentaire (vide ou case adverse)
+											// Parcours gauche
+											cpt = 0;
+											while(posI + cpt < 8 && posI + cpt >= 0 && posJ - cpt < 8 && posJ - cpt >= 0 && grid[posI + cpt][posJ - cpt] == owner)
+												{
+												cpt--;
+												}
+											if (posJ - cpt >= 8 && posI + cpt < 0)
+												{
+												// PION DEFINITIF sur l'horizontal
+												stable[3] = 1;
+												}
+											else
+												{
+												if (tmp == K_EMPTY && grid[posI+cpt][posJ - cpt] != 1 - owner || tmp == 1 - owner && grid[posI+cpt][posJ - cpt] != K_EMPTY)
+													{
+													stable[3] = 1;
+													}
+												}
+											}
+
+
+
+										if (stable[0] == 1 && stable[1] == 1 && stable[2] == 1 && stable[3] == 1 )
+											{
+											if (grid[posI][posJ] == owner)
+												{
+													stableGrid[posI][posJ] = 1;
+													}
+											else
+												{
+													stableGrid[posI][posJ] = -1;
+													}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}*/
+
 		int scoreEval = 0;
 		int adversaire = 1 - owner;
 		int nbPiecesIA, nbPiecesJoueur;
+
+		for(int i = 0; i < 64; i++)
+			{
+				scoreEval += stableGrid[i / 8][i % 8]*250;
+			}
+		System.out.println("STABLE" + scoreEval);
+
 		//System.out.println("OWNER = " + owner);
 		if (owner == K_BLUE)
 			{
@@ -678,10 +748,10 @@ public class Board
 			{
 			scoreEval -= 150;
 			}
-
+		//scoreEval += 10*this.findAvailableMoves().size();
+		//scoreEval *= this.findAvailableMoves().size();
 		//System.out.println("VAL="+scoreEval);
 		return scoreEval;
-
 		}
 
 	/*------------------------------------------------------------------*\
@@ -692,11 +762,13 @@ public class Board
 		{
 		// Initialise la grille avec toutes les cases vides
 		this.grid = new int[8][8];
+		this.stableGrid = new int[8][8];
 		for(int i = 0; i < 8; i++)
 			{
 			for(int j = 0; j < 8; j++)
 				{
 				this.grid[i][j] = K_EMPTY;
+				this.stableGrid[i][j] = K_EMPTY;
 				}
 			}
 
@@ -735,7 +807,7 @@ public class Board
 		return this.activePlayer;
 		}
 
-	public Position[] getAvailableMoves()
+	public ArrayList<Position> getAvailableMoves()
 		{
 		return this.coupsPossibles;
 		}
@@ -750,14 +822,16 @@ public class Board
 	\*------------------------------------------------------------------*/
 
 	private int grid[][];
+	private int stableGrid[][];
 	private int activePlayer;
-	private Position coupsPossibles[];
+	private ArrayList<Position> coupsPossibles;
 	private int bluePiecesNb;
 	private int redPiecesNb;
 	private int movesPlayed;
 	private int eval;
 
 	private static final int K_EMPTY = -1;
+	private static final int K_STABLE = 0;
 	private static final int K_RED = 0;
 	private static final int K_BLUE = 1;
 	}

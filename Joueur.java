@@ -51,6 +51,8 @@ public class Joueur extends Othello.Joueur
 			rootBoard = rootBoard.applyOp(tmp);
 			System.out.println(">> AFTER UPDATE");
 			rootBoard.displayBoard();
+			System.out.println(">> Stable Grid");
+			rootBoard.displayStableGrid();
 			}
 		else
 			{

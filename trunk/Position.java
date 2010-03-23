@@ -27,7 +27,6 @@ public class Position
 
 	@Override public boolean equals(Object obj)
 		{
-		// TODO Auto-generated method stub
 		Position tmp = (Position)obj;
 		return (tmp.i == this.i) && (tmp.j == this.j);
 		}

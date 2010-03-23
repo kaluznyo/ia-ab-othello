@@ -9,9 +9,6 @@ simplement lus ‡ la console!
 package Participants.FroidevauxKaluznyNeuhaus;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-
-import Othello.Move;
 
 // Pour l'interopÈrabilitÈ: il faut une reprÈsentation commune des coups!
 
@@ -51,10 +48,13 @@ public class Board
 			}
 		}
 
-	public Board(Board oldState, Move move)
+	public Board(Board oldState, Position move)
 		{
 		this(oldState);
+
 		this.updateBoard(move);
+
+		this.activePlayer = 1 - this.activePlayer;
 		}
 
 	/*------------------------------------------------------------------*\
@@ -66,12 +66,11 @@ public class Board
 		return 64 - bluePiecesNb - redPiecesNb;
 		}
 
-	public void updateBoard(Move move1)
+	public void updateBoard(Position move)
 		{
-		Move move = new Move(move1.j, move1.i);
 		int i = move.i;
 		int j = move.j;
-		System.out.println("Move Pos = (" + i + "," + j + ")");
+		//System.out.println("Move Pos = (" + i + "," + j + ")");
 		grid[i][j] = this.activePlayer;
 		int flippedPiecesNb = 0;
 
@@ -97,11 +96,13 @@ public class Board
 					// Traitement pour retourner les pièces
 					if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
 						{
+						//System.out.println("PTS: ("+i+","+j+")");
 						int cpt = 1;
 						// Retournement des pièces
 						while((move.i + cpt * angleI) * angleI < i * angleI || (move.j + cpt * angleJ) * angleJ < j * angleJ)
 							{
 							grid[move.i + angleI * cpt][move.j + angleJ * cpt] = this.activePlayer;
+							//System.out.println("FLIP: ("+(move.i + angleI * cpt)+","+(move.j + angleJ * cpt)+")");
 							cpt++;
 							flippedPiecesNb++;
 							}
@@ -110,7 +111,7 @@ public class Board
 				}
 			}
 
-		System.out.println("Pions retournés:" + flippedPiecesNb);
+		//System.out.println("Pions retournés:" + flippedPiecesNb);
 
 		// Mise à jour du nombre de pions de chaque joueur
 		if (this.activePlayer == K_BLUE)
@@ -124,17 +125,16 @@ public class Board
 			redPiecesNb += flippedPiecesNb + 1;
 			}
 
-		System.out.println("Pions bleu=" + bluePiecesNb + "/ rouge =" + redPiecesNb);
+		//System.out.println("Pions bleu=" + bluePiecesNb + "/ rouge =" + redPiecesNb);
 		}
 
-	public ArrayList<Move> rechercheCoupsPossibles(Move move1)
+	public ArrayList<Position> rechercheCoupsPossibles(Position move)
 		{
-		Move move = new Move(move1.j, move1.i);
 		int i = move.i;
 		int j = move.j;
-		System.out.println("Pos Coup = (" + i + "," + j + ")");
+		//System.out.println("Pos Coup = (" + i + "," + j + ")");
 		grid[i][j] = this.activePlayer;
-		ArrayList<Move> availableMoves = new ArrayList<Move>();
+		ArrayList<Position> availableMoves = new ArrayList<Position>();
 
 		for(int angleI = -1; angleI <= 1; angleI++)
 			{
@@ -154,7 +154,7 @@ public class Board
 					if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == K_EMPTY && (i != move.i + angleI || j != move.j + angleJ))
 						{
 						// Stockage du pion dans un arraylist
-						availableMoves.add(new Move(i, j));
+						availableMoves.add(new Position(i, j));
 						}
 					}
 				}
@@ -162,29 +162,29 @@ public class Board
 		return availableMoves;
 		}
 
-	/*
+
 		// Met à jour la grille à partir du coup joué
-		public void miseAJourGrille(Move coup1)
+		/*public void updateBoard(Position coup)
 			{
-			Move coup = new Move(coup1.j, coup1.i);
+			//Move coup = new Move(coup1.j, coup1.i);
 			int i = coup.i;
 			int j = coup.j;
 			System.out.println("Pos Coup = (" + i + "," + j + ")");
-			grille[i][j] = this.joueurActif;
+			grid[i][j] = this.activePlayer;
 			int nbPiecesRetournees = 0;
 			//Traitement vertical (Bas)
 			j++;
-			while(j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
+			while(j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
 				{
-				System.out.println("Test" + j);
+				//System.out.println("Test" + j);
 				j++;
 				}
 
-			if (j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
+			if (j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
 				{
 				for(int j2 = coup.j + 1; j2 < j; j2++)
 					{
-					grille[i][j2] = this.joueurActif;
+					grid[i][j2] = this.activePlayer;
 					System.out.println("VB> (" + i + "," + j2 + ")");
 					nbPiecesRetournees++;
 					//				if (this.joueurActif == K_BLEU)
@@ -194,16 +194,16 @@ public class Board
 
 			//Traitement vertical (Haut)
 			j = coup.j - 1;
-			while(j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
+			while(j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
 				{
 				j--;
 				}
 
-			if (j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
+			if (j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
 				{
 				for(int j2 = coup.j - 1; j2 > j; j2--)
 					{
-					grille[i][j2] = this.joueurActif;
+					grid[i][j2] = this.activePlayer;
 					System.out.println("VH> (" + i + "," + j2 + ")");
 					nbPiecesRetournees++;
 					}
@@ -212,16 +212,16 @@ public class Board
 			//Traitement horizontal (Gauche)
 			j = coup.j;
 			i = coup.i - 1;
-			while(i < 8 && i >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
+			while(i < 8 && i >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
 				{
 				i--;
 				}
 
-			if (i < 8 && i >= 0 && grille[i][j] == this.joueurActif)
+			if (i < 8 && i >= 0 && grid[i][j] == this.activePlayer)
 				{
 				for(int i2 = coup.i - 1; i2 > i; i2--)
 					{
-					grille[i2][j] = this.joueurActif;
+					grid[i2][j] = this.activePlayer;
 					System.out.println("HG> (" + i2 + "," + j + ")");
 					nbPiecesRetournees++;
 					}
@@ -229,16 +229,16 @@ public class Board
 
 			//Traitement horizontal (Droite)
 			i = coup.i + 1;
-			while(i < 8 && i >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
+			while(i < 8 && i >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
 				{
 				i++;
 				}
 
-			if (i < 8 && i >= 0 && grille[i][j] == this.joueurActif)
+			if (i < 8 && i >= 0 && grid[i][j] == this.activePlayer)
 				{
 				for(int i2 = coup.i + 1; i2 < i; i2++)
 					{
-					grille[i2][j] = this.joueurActif;
+					grid[i2][j] = this.activePlayer;
 					System.out.println("HD> (" + i2 + "," + j + ")");
 					nbPiecesRetournees++;
 					}
@@ -247,19 +247,19 @@ public class Board
 			//Traitement Diagonal (Bas,Droite)
 			i = coup.i + 1;
 			j = coup.j + 1;
-			while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
+			while(i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
 				{
 				i++;
 				j++;
 				}
 
-			if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
+			if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
 				{
 				nbPiecesRetournees--;
 				int cpt = 0;
 				while(coup.i + cpt < i)
 					{
-					grille[coup.i + cpt][coup.j + cpt] = this.joueurActif;
+					grid[coup.i + cpt][coup.j + cpt] = this.activePlayer;
 					System.out.println("DBD> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
 					cpt++;
 					nbPiecesRetournees++;
@@ -269,19 +269,19 @@ public class Board
 			//Traitement Diagonal (Haut,Gauche)
 			i = coup.i - 1;
 			j = coup.j - 1;
-			while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
+			while(i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
 				{
 				i--;
 				j--;
 				}
 
-			if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
+			if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
 				{
 				nbPiecesRetournees--;
 				int cpt = 0;
 				while(coup.i + cpt > i)
 					{
-					grille[coup.i + cpt][coup.j + cpt] = this.joueurActif;
+					grid[coup.i + cpt][coup.j + cpt] = this.activePlayer;
 					System.out.println("DHG> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
 					cpt--;
 					nbPiecesRetournees++;
@@ -291,19 +291,19 @@ public class Board
 			//Traitement Diagonal (Haut,Droite)
 			i = coup.i + 1;
 			j = coup.j - 1;
-			while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
+			while(i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
 				{
 				i++;
 				j--;
 				}
 
-			if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
+			if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
 				{
 				nbPiecesRetournees--;
 				int cpt = 0;
 				while(coup.i + cpt > i)
 					{
-					grille[coup.i + cpt][coup.j - cpt] = this.joueurActif;
+					grid[coup.i + cpt][coup.j - cpt] = this.activePlayer;
 					System.out.println("DHD> (" + (coup.i + cpt) + "," + (coup.i + cpt) + ")");
 					cpt++;
 					nbPiecesRetournees++;
@@ -313,45 +313,46 @@ public class Board
 			//Traitement Diagonal (Bas,Gauche)
 			i = coup.i - 1;
 			j = coup.j + 1;
-			while(i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] != K_VIDE && grille[i][j] != this.joueurActif)
+			while(i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] != K_EMPTY && grid[i][j] != this.activePlayer)
 				{
 				i--;
 				j++;
 				}
 
-			if (i < 8 && i >= 0 && j < 8 && j >= 0 && grille[i][j] == this.joueurActif)
+			if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
 				{
 				nbPiecesRetournees--;
 				int cpt = 0;
 				while(coup.i + cpt > i)
 					{
-					grille[coup.i + cpt][coup.j - cpt] = this.joueurActif;
+					grid[coup.i + cpt][coup.j - cpt] = this.activePlayer;
 					System.out.println("DBD> (" + (coup.i + cpt) + "," + (coup.i - cpt) + ")");
 					nbPiecesRetournees++;
 					cpt--;
 					}
 				}
 
-			System.out.println("Pions retournés:" + nbPiecesRetournees);
+			//System.out.println("Pions retournés:" + nbPiecesRetournees);
 
 			// Mise à jour du nombre de pions de chaque joueur
-			if (this.joueurActif == K_BLEU)
+			if (this.activePlayer == K_BLUE)
 				{
-				nbPionsBleu += nbPiecesRetournees + 1;
-				nbPionsRouge -= nbPiecesRetournees;
+				bluePiecesNb += nbPiecesRetournees + 1;
+				redPiecesNb -= nbPiecesRetournees;
 				}
 			else
 				{
-				nbPionsBleu -= nbPiecesRetournees;
-				nbPionsRouge += nbPiecesRetournees + 1;
+				bluePiecesNb -= nbPiecesRetournees;
+				redPiecesNb += nbPiecesRetournees + 1;
 				}
-			System.out.println("Pions bleu=" + nbPionsBleu + "/ rouge =" + nbPionsRouge);
-			}
-		*/
+			//System.out.println("Pions bleu=" + bluePiecesNb + "/ rouge =" + redPiecesNb);
+			System.out.println("********");
+			}*/
 
-	public ArrayList<Move> findPlayerPieces()
+
+	public ArrayList<Position> findPlayerPieces()
 		{
-		ArrayList<Move> playerPieces = new ArrayList<Move>();
+		ArrayList<Position> playerPieces = new ArrayList<Position>();
 		// Récupère les pions du joueur actif
 		for(int i = 0; i < 8; i++)
 			{
@@ -359,35 +360,41 @@ public class Board
 				{
 				if (grid[i][j] == activePlayer)
 					{
-					// Trouver les coups possibles
-					playerPieces.add(new Move(i, j));
+					// Trouver les pions du joueur actif
+					playerPieces.add(new Position(i, j));
 					}
 				}
 			}
 		return playerPieces;
 		}
 
-	public HashSet<Move> findAvailableMoves()
-		{
-		ArrayList<Move> playerPieces = findPlayerPieces();
-		HashSet<Move> operatorsAvailable = new HashSet<Move>();
 
-		for(Move move:playerPieces)
+	public ArrayList<Position> findAvailableMoves()
+		{
+		ArrayList<Position> playerPieces = findPlayerPieces();
+		ArrayList<Position> operatorsAvailable = new ArrayList<Position>();
+
+		for(Position move:playerPieces)
 			{
 			// Recherche coups possibles
-			for(Move move1:rechercheCoupsPossibles(move))
+			for(Position move1:rechercheCoupsPossibles(move))
 				{
-				operatorsAvailable.add(move1);
+				if (!operatorsAvailable.contains(move1))
+					{
+					operatorsAvailable.add(move1);
+					}
 				}
 			}
 
 		return operatorsAvailable;
 		}
 
+
 	public Board getNextBoard()
 		{
 		return new Board(this, 1 - this.activePlayer);
 		}
+
 
 	public void displayBoard()
 		{
@@ -406,27 +413,29 @@ public class Board
 				}
 			System.out.println();
 			}
+		System.out.println();
 		}
 
 
-
 	// IMPORTANT METHODS
-	public Board applyOp(Move move)
+	public Board applyOp(Position move)
 		{
 		// return a new board with the move applied
 		return new Board(this, move);
 		}
 
+
 	public boolean isFinal()
 		{
-		return (this.findAvailableMoves().isEmpty() || this.emptyCaseNb()==0);
+		return (this.findAvailableMoves().isEmpty() || this.emptyCaseNb() == 0);
 		}
+
 
 	public int evalBoard()
 		{
 		// TODO Auto-generated method stub
 		// Evaluate the current state of the board
-		return (int)(Math.random()*100);
+		return 1;//(int)(Math.random() * 100);
 		}
 
 	/*------------------------------------------------------------------*\
@@ -480,7 +489,7 @@ public class Board
 		return this.activePlayer;
 		}
 
-	public Move[] getAvailableMoves()
+	public Position[] getAvailableMoves()
 		{
 		return this.coupsPossibles;
 		}
@@ -496,7 +505,7 @@ public class Board
 
 	private int grid[][];
 	private int activePlayer;
-	private Move coupsPossibles[];
+	private Position coupsPossibles[];
 	private int bluePiecesNb;
 	private int redPiecesNb;
 	private int movesPlayed;

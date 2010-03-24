@@ -52,8 +52,9 @@ public class Joueur extends Othello.Joueur
 			System.out.println(">> AFTER UPDATE");
 			rootBoard.displayBoard();
 			System.out.println(">> Stable Grid");
-			rootBoard.displayStableGrid();
-			}
+			rootBoard.displayPointsGrid();
+			System.out.println("*** MOB = " + rootBoard.scoreMobility + " / POS = " + rootBoard.scorePosition + " / MAT = " + rootBoard.scoreMaterial);
+	}
 		else
 			{
 			System.out.println("******No move available");
@@ -78,7 +79,7 @@ public class Joueur extends Othello.Joueur
 		Position tmp1 = tmp2.getPosition();
 		System.out.println("Eval="+tmp2.getEvalValue());
 		rootBoard = rootBoard.applyOp(tmp1);
-
+		//rootBoard.displayPointsGrid();
 
 		if (tmp1 == null)
 			{

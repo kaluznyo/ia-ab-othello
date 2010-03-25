@@ -21,8 +21,8 @@ public class Position
 	public Position(Move move)
 		{
 		super();
-		this.i = move.j;
-		this.j = move.i;
+		this.i = move.i;
+		this.j = move.j;
 		}
 
 	@Override public boolean equals(Object obj)
@@ -39,7 +39,7 @@ public class Position
 
 	public Move toMove()
 		{
-		return new Move(this.j, this.i);
+		return new Move(this.i, this.j);
 		}
 	/*------------------------------------------------------------------*\
 	|*							Methodes Public							*|

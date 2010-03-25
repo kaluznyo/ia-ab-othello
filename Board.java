@@ -28,14 +28,14 @@ public class Board
 		this.movesPlayed = movesPlayed;
 		this.owner = owner;
 		initBoard();
-		this.eval = evalBoard();
+		//this.eval = evalBoard();
 		}
 
 	public int owner;
 
 	public Board(int activePlayer)
 		{
-		this(activePlayer, 2, 2, 0, 1 - activePlayer);
+		this(0, 2, 2, 0, activePlayer);
 		}
 
 	/*public Board(Board board, int activePlayer)
@@ -52,11 +52,13 @@ public class Board
 		this(plateau.activePlayer, plateau.bluePiecesNb, plateau.redPiecesNb, plateau.movesPlayed, plateau.owner);
 		for(int i = 0; i < 8; i++)
 			{
-			System.arraycopy(plateau.grid[i], 0, this.grid[i], 0, 8);
-			}
-		for(int i = 0; i < 8; i++)
-			{
-			System.arraycopy(plateau.pointsGrid[i], 0, this.pointsGrid[i], 0, 8);
+			for(int j = 0; j < 8; j++)
+				{
+				this.grid[i][j] = plateau.grid[i][j];
+				this.pointsGrid[i][j] = plateau.pointsGrid[i][j];
+				}
+			//System.arraycopy(plateau.grid[i], 0, this.grid[i], 0, 8);
+			//System.arraycopy(plateau.pointsGrid[i], 0, this.pointsGrid[i], 0, 8);
 			}
 		}
 
@@ -67,7 +69,6 @@ public class Board
 			{
 			this.updateBoard(move);
 			}
-
 		this.activePlayer = 1 - this.activePlayer;
 		}
 
@@ -82,12 +83,14 @@ public class Board
 
 	public void updateBoard(Position move)
 		{
+		//Position move = new Position(move1.j, move1.i);
 		int i = move.i;
 		int j = move.j;
-		//System.out.println("Move Pos = (" + i + "," + j + ")");
+		//System.out.println("Move Pos = (" + i + "," + j + ") / active = " + this.activePlayer);
 		grid[i][j] = this.activePlayer;
 		int flippedPiecesNb = 0;
-
+		//System.out.println("***BEFORE UPDATE2***");
+		//this.displayBoard();
 		// Variation de i
 		for(int angleI = -1; angleI <= 1; angleI++)
 			{
@@ -125,6 +128,8 @@ public class Board
 				}
 			}
 
+		//		System.out.println("***AFTER UPDATE***");		this.displayBoard();
+
 		//System.out.println("Pions retournés:" + flippedPiecesNb);
 
 		// Mise à jour du nombre de pions de chaque joueur
@@ -147,7 +152,7 @@ public class Board
 		int i = move.i;
 		int j = move.j;
 		//System.out.println("Pos Coup = (" + i + "," + j + ")");
-		grid[i][j] = this.activePlayer;
+		//grid[i][j] = this.activePlayer;
 		ArrayList<Position> availableMoves = new ArrayList<Position>();
 
 		for(int angleI = -1; angleI <= 1; angleI++)
@@ -176,14 +181,70 @@ public class Board
 		return availableMoves;
 		}
 
-	public ArrayList<Position> findPlayerPieces()
+	public ArrayList<Position> rechercheCoupsPossiblesOwner(Position move)
+	{
+	int i = move.i;
+	int j = move.j;
+	//System.out.println("Pos Coup = (" + i + "," + j + ")");
+	//grid[i][j] = this.activePlayer;
+	ArrayList<Position> availableMoves = new ArrayList<Position>();
+
+	for(int angleI = -1; angleI <= 1; angleI++)
 		{
-		ArrayList<Position> playerPieces = new ArrayList<Position>();
+		for(int angleJ = -1; angleJ <= 1; angleJ++)
+			{
+			if (angleI != 0 || angleJ != 0)
+				{
+				i = move.i + angleI;
+				j = move.j + angleJ;
+				while(i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == (1 - owner))
+					{
+					i += angleI;
+					j += angleJ;
+					}
+
+				// Prochaine case vide après des cases blanches
+				if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == K_EMPTY && (i != move.i + angleI || j != move.j + angleJ))
+					{
+					// Stockage du pion dans un arraylist
+					availableMoves.add(new Position(i, j));
+					}
+				}
+			}
+		}
+	return availableMoves;
+	}
+
+	public ArrayList<Position> findOwnerPieces()
+		{
+		ArrayList<Position> ownerPieces = new ArrayList<Position>();
+
 		// Récupère les pions du joueur actif
 		for(int i = 0; i < 8; i++)
 			{
 			for(int j = 0; j < 8; j++)
 				{
+
+				if (grid[i][j] == owner)
+					{
+					// Trouver les pions du joueur actif
+					ownerPieces.add(new Position(i, j));
+					}
+				}
+			}
+		return ownerPieces;
+		}
+
+	public ArrayList<Position> findPlayerPieces()
+		{
+		ArrayList<Position> playerPieces = new ArrayList<Position>();
+
+		// Récupère les pions du joueur actif
+		for(int i = 0; i < 8; i++)
+			{
+			for(int j = 0; j < 8; j++)
+				{
+
 				if (grid[i][j] == activePlayer)
 					{
 					// Trouver les pions du joueur actif
@@ -194,10 +255,31 @@ public class Board
 		return playerPieces;
 		}
 
+	public ArrayList<Position> findOwnerAvailableMoves()
+		{
+		ArrayList<Position> ownerPieces = findOwnerPieces();
+		ArrayList<Position> operatorsAvailable = new ArrayList<Position>();
+		System.out.println("Pieces=" + ownerPieces.size());
+		for(Position move:ownerPieces)
+			{
+			// Recherche coups possibles
+			for(Position move1:rechercheCoupsPossiblesOwner(move))
+				{
+				if (!operatorsAvailable.contains(move1))
+					{
+					operatorsAvailable.add(move1);
+					}
+				}
+			}
+		//coupsPossibles = new ArrayList<Position>(operatorsAvailable);
+		return operatorsAvailable;
+		}
+
 	public ArrayList<Position> findAvailableMoves()
 		{
 		ArrayList<Position> playerPieces = findPlayerPieces();
 		ArrayList<Position> operatorsAvailable = new ArrayList<Position>();
+		System.out.println("Pieces=" + playerPieces.size());
 
 		for(Position move:playerPieces)
 			{
@@ -214,16 +296,16 @@ public class Board
 		return operatorsAvailable;
 		}
 
-	public Board getNextBoard()
-		{
-		return new Board(this, null);//1 - this.activePlayer);
-		}
+	//	public Board getNextBoard()
+	//		{
+	//		return new Board(this, null);//1 - this.activePlayer);
+	//		}
 
 	public void displayBoard()
 		{
-		for(int i = 0; i < 8; i++)
+		for(int j = 0; j < 8; j++)
 			{
-			for(int j = 0; j < 8; j++)
+			for(int i = 0; i < 8; i++)
 				{
 				if (this.grid[i][j] == K_EMPTY)
 					{
@@ -241,9 +323,9 @@ public class Board
 
 	public void displayPointsGrid()
 		{
-		for(int i = 0; i < 8; i++)
+		for(int j = 0; j < 8; j++)
 			{
-			for(int j = 0; j < 8; j++)
+			for(int i = 0; i < 8; i++)
 				{
 				if (this.pointsGrid[i][j] == K_EMPTY)
 					{
@@ -264,7 +346,7 @@ public class Board
 		{
 		// return a new board with the move applied
 		movesPlayed++;
-		if (move != null)
+		/*if (move != null)
 			{
 			if (move.i == 0 && move.j == 0)
 				{
@@ -289,7 +371,7 @@ public class Board
 				pointsGrid[6][7] = 200;
 				pointsGrid[7][6] = 200;
 				}
-			}
+			}*/
 
 		return new Board(this, move);
 		}
@@ -301,21 +383,95 @@ public class Board
 
 	public int evalBoard()
 		{
-		int coefMobility = 10;
-		int coefPosition = 7;
-		int coefMaterial = 1;
+		int coefMobility = 0;
+		int coefPosition = 1;
+		int coefMaterial = 0;
 
-		scoreMobility = this.findAvailableMoves().size();
+		// Variation des coeff au long de la partie:
+		// Debut de jeu
+		if (bluePiecesNb + redPiecesNb <= 15)
+			{
+			coefMobility = 10;
+			coefPosition = 7;
+			coefMaterial = 1;
+			}
+		// Milieu de jeu
+		else if (bluePiecesNb + redPiecesNb <= 45)
+			{
+			coefMobility = 3;
+			coefPosition = 10;
+			coefMaterial = 3;
+			}
+		// Fin de jeu
+		else
+			{
+			coefMobility = 0;
+			coefPosition = 5;
+			coefMaterial = 10;
+			}
+		int adversaire = 1 - owner;
+
+		// Mobility = nbre de coups dispo
+
+		//TODO: find the bug here when match ours<>SchulzeVacirca (last move)
+		scoreMobility = this.findOwnerAvailableMoves().size();
+		this.displayBoard();
+		for(Position pos:this.findOwnerAvailableMoves())
+			{
+			System.out.println(" > OWNER MOVE = ("+pos.i+","+pos.j+")");
+			}
+
+		System.out.println(" >>> MOB = " + scoreMobility);
 		scoreMaterial = 0;
 		scorePosition = 0;
 
-		if (owner == K_BLUE)
+		// Vérification des coins et leurs voisins
+		if (grid[0][0] == owner)
 			{
-			scoreMaterial = bluePiecesNb;
+			pointsGrid[0][1] = 200;
+			pointsGrid[1][0] = 200;
 			}
-		else
+
+		if (grid[7][0] == owner)
 			{
-			scoreMaterial = redPiecesNb;
+			pointsGrid[6][0] = 200;
+			pointsGrid[7][1] = 200;
+			}
+
+		if (grid[0][7] == owner)
+			{
+			pointsGrid[0][6] = 200;
+			pointsGrid[1][7] = 200;
+			}
+
+		if (grid[7][7] == owner)
+			{
+			pointsGrid[6][7] = 200;
+			pointsGrid[7][6] = 200;
+			}
+
+		if (grid[0][0] == adversaire)
+			{
+			pointsGrid[0][1] = -200;
+			pointsGrid[1][0] = -200;
+			}
+
+		if (grid[7][0] == adversaire)
+			{
+			pointsGrid[6][0] = -200;
+			pointsGrid[7][1] = -200;
+			}
+
+		if (grid[0][7] == adversaire)
+			{
+			pointsGrid[0][6] = -200;
+			pointsGrid[1][7] = -200;
+			}
+
+		if (grid[7][7] == adversaire)
+			{
+			pointsGrid[6][7] = -200;
+			pointsGrid[7][6] = -200;
 			}
 
 		//Calcul du scorePosition
@@ -325,24 +481,35 @@ public class Board
 				{
 				if (grid[i][j] == owner)
 					{
-//					System.out.println("***********");
-//					this.displayBoard();
-//					System.out.println("***********");
-//					this.displayPointsGrid();
-//					System.out.println("***********");
 
+					//					System.out.println("***********");
+					//					this.displayBoard();
+					//					System.out.println("***********");
+					//					this.displayPointsGrid();
+					//					System.out.println("***********");
+
+					// Mise à jour du nbre de pions
+					scoreMaterial += 10;
+
+					// score en fonction de la position
 					scorePosition += pointsGrid[i][j];
-					System.out.println("PASS" + pointsGrid[i][j]);
+					//System.out.println("PASS" + pointsGrid[i][j]);
 					}
-				else if (grid[i][j] == 1 - owner)
+				else if (grid[i][j] == adversaire)
 					{
+					// Mise à jour du nbre de pions
+					scoreMaterial -= 10;
+
+					// score en fonction de la position
 					scorePosition -= pointsGrid[i][j];
-				//	System.out.println("PASS1");
+					//	System.out.println("PASS1");
 					}
 				}
 			}
+		//this.displayBoard();
 		//System.out.println(">> POS"+ scorePosition);
-		return coefMobility * scoreMobility + coefPosition * scorePosition + coefMaterial * scoreMaterial;
+
+		return (coefMobility * scoreMobility + coefPosition * scorePosition + coefMaterial * scoreMaterial);
 		}
 
 	/*------------------------------------------------------------------*\
@@ -450,39 +617,9 @@ public class Board
 	|*				Set				*|
 	\*------------------------------*/
 
-	public void setActivePlayer(int activePlayer)
-		{
-		this.activePlayer = activePlayer;
-		}
-
-	public void setGrid(int[][] grid)
-		{
-		this.grid = grid;
-		}
-
 	/*------------------------------*\
 	|*				Get				*|
 	\*------------------------------*/
-
-	public int[][] getGrid()
-		{
-		return this.grid;
-		}
-
-	public int getActivePlayer()
-		{
-		return this.activePlayer;
-		}
-
-	public ArrayList<Position> getAvailableMoves()
-		{
-		return this.coupsPossibles;
-		}
-
-	public int getEval()
-		{
-		return this.eval;
-		}
 
 	/*------------------------------------------------------------------*\
 	|*							Attributs Private						*|
@@ -491,18 +628,18 @@ public class Board
 	private int grid[][];
 	private int pointsGrid[][];
 	private int activePlayer;
-	private ArrayList<Position> coupsPossibles;
+	//	private ArrayList<Position> coupsPossibles;
 	private int bluePiecesNb;
 	private int redPiecesNb;
 	private int movesPlayed;
-	private int eval;
+	//private int eval;
 
 	public int scoreMobility;
 	public int scoreMaterial;
 	public int scorePosition;
 
 	private static final int K_EMPTY = -1;
-	private static final int K_STABLE = 0;
+	//	private static final int K_STABLE = 0;
 	private static final int K_RED = 0;
 	private static final int K_BLUE = 1;
 	}

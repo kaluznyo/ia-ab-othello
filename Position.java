@@ -3,27 +3,30 @@ package Participants.FroidevauxKaluznyNeuhaus;
 
 import Othello.Move;
 
-public class Position
+/*
+ * Cette classe permet d'étendre la classe Move en lui ajoutant la méthode equals
+ *
+ * */
+public class Position extends Move
 	{
-
-	public int i, j;
 
 	/*------------------------------------------------------------------*\
 	|*							Constructeurs							*|
 	\*------------------------------------------------------------------*/
 	public Position(int i, int j)
 		{
-		super();
-		this.i = i;
-		this.j = j;
+		super(i, j);
 		}
 
 	public Position(Move move)
 		{
-		super();
-		this.i = move.i;
-		this.j = move.j;
+		super(move.i, move.j);
 		}
+
+
+	/*------------------------------------------------------------------*\
+	|*							Methodes Public							*|
+	\*------------------------------------------------------------------*/
 
 	@Override public boolean equals(Object obj)
 		{
@@ -31,33 +34,8 @@ public class Position
 		return (tmp.i == this.i) && (tmp.j == this.j);
 		}
 
-	private boolean isEqual(Position pos)
-		{
-		return (pos.i == this.i) && (pos.j == this.j);
-		}
-
-
 	public Move toMove()
 		{
 		return new Move(this.i, this.j);
 		}
-	/*------------------------------------------------------------------*\
-	|*							Methodes Public							*|
-	\*------------------------------------------------------------------*/
-
-	/*------------------------------*\
-	|*				Set				*|
-	\*------------------------------*/
-
-	/*------------------------------*\
-	|*				Get				*|
-	\*------------------------------*/
-
-	/*------------------------------------------------------------------*\
-	|*							Methodes Private						*|
-	\*------------------------------------------------------------------*/
-
-	/*------------------------------------------------------------------*\
-	|*							Attributs Private						*|
-	\*------------------------------------------------------------------*/
 	}

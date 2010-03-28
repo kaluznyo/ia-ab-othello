@@ -1,6 +1,11 @@
 
 package Participants.FroidevauxKaluznyNeuhaus;
 
+
+/*
+ * Cette classe permet de stocker les valeurs de retour de la fonction alpha-beta
+ *
+ * */
 public final class AlphaBetaReturnValues
 	{
 	/*------------------------------------------------------------------*\
@@ -18,19 +23,6 @@ public final class AlphaBetaReturnValues
 	\*------------------------------------------------------------------*/
 
 	/*------------------------------*\
-	|*				Set				*|
-	\*------------------------------*/
-//	public void setMove(Move move)
-//		{
-//		this.move = move;
-//		}
-//
-//	public void setEvalValue(int evalValue)
-//		{
-//		this.evalValue = evalValue;
-//		}
-
-	/*------------------------------*\
 	|*				Get				*|
 	\*------------------------------*/
 	public Position getPosition()
@@ -42,10 +34,6 @@ public final class AlphaBetaReturnValues
 		{
 		return this.evalValue;
 		}
-
-	/*------------------------------------------------------------------*\
-	|*							Methodes Private						*|
-	\*------------------------------------------------------------------*/
 
 	/*------------------------------------------------------------------*\
 	|*							Attributs Private						*|

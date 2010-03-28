@@ -26,58 +26,33 @@ public class Joueur extends Othello.Joueur
 	// Méthode appelée à chaque fois que vous devez jouer un coup.
 	@Override public Move nextPlay(Move move)
 		{
-		// Ici, vous devrez
-		// - Mettre à jour votre représentation du jeu en fonction du coup joué par l'adversaire
-		// - Décider quel coup jouer (alpha-beta!!)
-		// - Remettre à jour votre représentation du jeu
-		// - Retourner le coup choisi
-		// Mais ici, on se contente de lire à la console:
 
 		if (move != null)
 			{
-			System.out.println(">> BEFORE UPDATE/ Move = (" + move.i + "," + move.j + ")");
-
 			Position tmp = new Position(move);
-			// System.out.println(">> BEFORE UPDATE/ tmp = (" + tmp.i + "," + tmp.j + ")");
-			// rootBoard.displayBoard();
-
 			// Mise à jour du jeu en fonction du coup joué par l'adversaire
 			rootBoard = rootBoard.applyOp(tmp);
-
-			// System.out.println(">> AFTER UPDATE");
-			// rootBoard.displayBoard();
-
-			//rootBoard.displayBoard();
 			}
 		else
 			{
+			// Si ce n'est pas le premier coup et que c'est à nous de jouer
 			if (rootBoard.movesPlayed > 0)
 				{
+				// Applique un mouvement nul si l'adversaire ne peut pas jouer
 				rootBoard = rootBoard.applyOp(null);
 				}
 			}
 
-		// Trouve un coup qui maximise notre prochain coup
+		// Trouve un bon prochain coup
 		AlphaBetaReturnValues tmp2 = alphabeta(rootBoard, depth, 1, Integer.MAX_VALUE);
 
 		// Récupère la position
 		Position tmp1 = tmp2.getPosition();
+
 		// Mise à jour du jeu en appliquant le coup trouvé
 		rootBoard = rootBoard.applyOp(tmp1);
-//		System.out.println("STAB = " + rootBoard.evalStability());
-		rootBoard.displayStableGrid();
-		rootBoard.evalBoard();
-		System.out.println("*** MOB = " + rootBoard.scoreMobility + " / POS = " + rootBoard.scorePosition + " / MAT = " + rootBoard.scoreMaterial + " / "+rootBoard.scoreStability);
 
-		//		System.out.println("Eval=" + rootBoard.evalBoard() +" / AB eval="+ tmp2.getEvalValue());
-
-		//		rootBoard.displayBoard();
-		//		ArrayList<Position> tmp = rootBoard.findAvailableMoves();// rechercheCoupsPossibles(new Move(3,3));
-		//		for(Position t:tmp)
-		//			{
-		//			System.out.println("MovePossible= (" + t.i +","+t.j+")");
-		//			}
-
+		// Renvoie le coup à jouer
 		if (tmp1 == null)
 			{
 			return null;
@@ -94,15 +69,13 @@ public class Joueur extends Othello.Joueur
 		{
 		if (depth == 0 || root.isFinal())
 			{
-			// Retourne l'éŽvaluation de la grille et il n'y a plus de coups possibles
 			return new AlphaBetaReturnValues(null, root.evalBoard());
 			}
 		int optVal = minormax * Integer.MIN_VALUE;
 		Position optOp = null;
 
-		for(Position op:root.findAvailableMoves()) //int i=0; i<root.findAvailableMoves().size(); i++)
+		for(Position op:root.findAvailableMoves())
 			{
-			//Position op = root.findAvailableMoves().get(i);
 			Board newState = root.applyOp(op);
 
 			int val = alphabeta(newState, depth - 1, -minormax, optVal).getEvalValue();

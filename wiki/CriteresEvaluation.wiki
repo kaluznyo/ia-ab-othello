@@ -14,20 +14,20 @@ Ces 4 critères sont chacun pondérés par un coefficient qui varie durant la pa
 == Variation des coefficients durant la partie ==
 
 Nous distinguons 3 phases de jeu :
-  # Le début du jeu (moins de 15 pions sur le plateau de jeu)
+  # Le début du jeu (moins de 30 pions sur le plateau de jeu)
   # Le milieu du jeu (entre 15 et 45 pions sur le plateau)
   # La fin du jeu (entre 45 et 64 pions sur le plateau)
 
 Nous avons les coefficients suivants pour les différentes phases de jeu:
 Durant la première phase:
-  * position = 10
-  * mobilité = 10
+  * position = 200
+  * mobilité = 1000
   * matériel = 1
 
 Durant la seconde phase:
-  * position = 10
-  * mobilité = 3
-  * matériel = 3
+  * position = 100
+  * mobilité = 300
+  * matériel = 30
 
 Durant la troisième phase:
   * position = 5

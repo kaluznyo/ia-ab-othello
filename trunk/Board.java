@@ -1,18 +1,12 @@
 /*
-Exemple d'implÈmentation d'un joueur d'Othello. Cette implÈmentation sert uniquement
-‡ dÈmontrer le principe, mais n'implÈmente aucune intelligence: les coups ‡ jouer sont
-simplement lus ‡ la console!
+Cette classe permet de gÈrer le plateau de jeu.
+On y trouve les mÈthodes pour mettre ‡ jour le plateau ainsi que celles pour Èvaluer un Ètat de jeu.
 */
-
-// Votre version sera dans Participants.<VosNoms>
 
 package Participants.FroidevauxKaluznyNeuhaus;
 
 import java.util.ArrayList;
 
-// Pour l'interopÈrabilitÈ: il faut une reprÈsentation commune des coups!
-
-// Vous devrez Ètendre Othello.Joueur pour implÈmenter votre propre joueur...
 public class Board
 	{
 
@@ -30,10 +24,12 @@ public class Board
 		initBoard();
 		}
 
+
 	public Board(int activePlayer)
 		{
 		this(0, 2, 2, 0, activePlayer);
 		}
+
 
 	public Board(Board plateau)
 		{
@@ -46,26 +42,30 @@ public class Board
 				this.pointsGrid[i][j] = plateau.pointsGrid[i][j];
 				this.stableGrid[i][j] = plateau.stableGrid[i][j];
 				}
-			//System.arraycopy(plateau.grid[i], 0, this.grid[i], 0, 8);
-			//System.arraycopy(plateau.pointsGrid[i], 0, this.pointsGrid[i], 0, 8);
 			}
 		}
+
 
 	public Board(Board oldState, Position move)
 		{
 		this(oldState);
+		// Applique le coup au plateau
 		if (move != null)
 			{
 			this.updateBoard(move);
 			}
-		ArrayList<Position> coupsPossibles = findPlayerPieces();
-		if (movesPlayed > 0 && coupsPossibles != null)
+
+		// Met ‡ jour la valeur de stabilitÈ du plateau
+		ArrayList<Position> availableMoves = findPlayerPieces();
+		if (movesPlayed > 0 && availableMoves != null)
 			{
-			for(Position pos:coupsPossibles)
+			for(Position pos:availableMoves)
 				{
 				updateStability(pos);
 				}
 			}
+
+		// Change le joueur actif
 		this.activePlayer = 1 - this.activePlayer;
 		}
 
@@ -73,21 +73,23 @@ public class Board
 	|*							Methodes Public							*|
 	\*------------------------------------------------------------------*/
 
+	// Renvoie le nombre de case vide
 	public int emptyCaseNb()
 		{
 		return 64 - bluePiecesNb - redPiecesNb;
 		}
 
+	// Retourne les pions suite au coup passÈ en paramËtre
 	public void updateBoard(Position move)
 		{
-		//Position move = new Position(move1.j, move1.i);
 		int i = move.i;
 		int j = move.j;
-		//System.out.println("Move Pos = (" + i + "," + j + ") / active = " + this.activePlayer);
+
+		// Attribue le coup jouÈ au joueur actid
 		grid[i][j] = this.activePlayer;
+
 		int flippedPiecesNb = 0;
-		//System.out.println("***BEFORE UPDATE2***");
-		//this.displayBoard();
+
 		// Variation de i
 		for(int angleI = -1; angleI <= 1; angleI++)
 			{
@@ -97,7 +99,7 @@ public class Board
 				// On ne prend pas en compte le cas ou i et j sont nuls
 				if (!(angleI == 0 && angleJ == 0))
 					{
-					// Initialisation de la position de recherche initiale (case à côté de la position intiale)
+					// Initialisation de la position de recherche initiale (case à‡ cÙôÈté de la position initiale)
 					i = move.i + angleI;
 					j = move.j + angleJ;
 					// parcours pour chercher les cases que l'on peut retourner
@@ -107,16 +109,14 @@ public class Board
 						j += angleJ;
 						}
 
-					// Traitement pour retourner les pièces
+					// Traitement pour retourner les piËces
 					if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == this.activePlayer)
 						{
-						//System.out.println("PTS: ("+i+","+j+")");
 						int cpt = 1;
-						// Retournement des pièces
+						// Retournement des pièËces
 						while((move.i + cpt * angleI) * angleI < i * angleI || (move.j + cpt * angleJ) * angleJ < j * angleJ)
 							{
 							grid[move.i + angleI * cpt][move.j + angleJ * cpt] = this.activePlayer;
-							//System.out.println("FLIP: ("+(move.i + angleI * cpt)+","+(move.j + angleJ * cpt)+")");
 							cpt++;
 							flippedPiecesNb++;
 							}
@@ -124,10 +124,6 @@ public class Board
 					}
 				}
 			}
-
-		//		System.out.println("***AFTER UPDATE***");		this.displayBoard();
-
-		//System.out.println("Pions retournés:" + flippedPiecesNb);
 
 		// Mise à jour du nombre de pions de chaque joueur
 		if (this.activePlayer == K_BLUE)
@@ -140,16 +136,16 @@ public class Board
 			bluePiecesNb -= flippedPiecesNb;
 			redPiecesNb += flippedPiecesNb + 1;
 			}
-
-		//System.out.println("Pions bleu=" + bluePiecesNb + "/ rouge =" + redPiecesNb);
 		}
 
-	public ArrayList<Position> rechercheCoupsPossibles(Position move)
+
+	// Recherche tous les coups possibles ‡ partir de la position passÈ en paramËtre
+	// POUR LE JOUEUR ACTIF
+	public ArrayList<Position> findAvailableMoves(Position move)
 		{
 		int i = move.i;
 		int j = move.j;
-		//System.out.println("Pos Coup = (" + i + "," + j + ")");
-		//grid[i][j] = this.activePlayer;
+
 		ArrayList<Position> availableMoves = new ArrayList<Position>();
 
 		for(int angleI = -1; angleI <= 1; angleI++)
@@ -160,13 +156,14 @@ public class Board
 					{
 					i = move.i + angleI;
 					j = move.j + angleJ;
+					// Tant que l'on peut sauter par dessus le(s) pion(s) de l'autre joueur, on continue
 					while(i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == (1 - this.activePlayer))
 						{
 						i += angleI;
 						j += angleJ;
 						}
 
-					// Prochaine case vide après des cases blanches
+					// Prochaine case vide aprËès des cases blanches
 					if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == K_EMPTY && (i != move.i + angleI || j != move.j + angleJ))
 						{
 						// Stockage du pion dans un arraylist
@@ -175,9 +172,14 @@ public class Board
 					}
 				}
 			}
+
+		// Renvoie tous les coups trouvÈs
 		return availableMoves;
 		}
 
+
+	// Recherche tous les coups possibles ‡ partir de la position passÈ en paramËtre
+	// POUR L'IA (crÈateur du plateau)
 	public ArrayList<Position> rechercheCoupsPossiblesOwner(Position move)
 		{
 		int i = move.i;
@@ -193,13 +195,14 @@ public class Board
 					{
 					i = move.i + angleI;
 					j = move.j + angleJ;
+					// Tant que l'on peut sauter par dessus le(s) pion(s) de l'autre joueur, on continue
 					while(i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == (1 - owner))
 						{
 						i += angleI;
 						j += angleJ;
 						}
 
-					// Prochaine case vide après des cases blanches
+					// Prochaine case vide aprËs des cases blanches
 					if (i < 8 && i >= 0 && j < 8 && j >= 0 && grid[i][j] == K_EMPTY && (i != move.i + angleI || j != move.j + angleJ))
 						{
 						// Stockage du pion dans un arraylist
@@ -208,9 +211,13 @@ public class Board
 					}
 				}
 			}
+
+		// Renvoie tous les coups trouvÈs
 		return availableMoves;
 		}
 
+
+	// Renvoie la liste de tous les pions de l'IA (crÈateur du plateau)
 	public ArrayList<Position> findOwnerPieces()
 		{
 		ArrayList<Position> ownerPieces = new ArrayList<Position>();
@@ -220,10 +227,9 @@ public class Board
 			{
 			for(int j = 0; j < 8; j++)
 				{
-
 				if (grid[i][j] == owner)
 					{
-					// Trouver les pions du joueur actif
+					// Ajouter les pions du joueur actif
 					ownerPieces.add(new Position(i, j));
 					}
 				}
@@ -231,6 +237,8 @@ public class Board
 		return ownerPieces;
 		}
 
+
+	// Renvoie la liste de tous les pions du joueur actif
 	public ArrayList<Position> findPlayerPieces()
 		{
 		ArrayList<Position> playerPieces = new ArrayList<Position>();
@@ -251,6 +259,9 @@ public class Board
 		return playerPieces;
 		}
 
+
+	// Recherche tous les coups possibles ‡ partir des pions de l'IA
+	// POUR L'IA (crÈateur du plateau)
 	public ArrayList<Position> findOwnerAvailableMoves()
 		{
 		ArrayList<Position> ownerPieces = findOwnerPieces();
@@ -269,6 +280,9 @@ public class Board
 		return operatorsAvailable;
 		}
 
+
+	// Recherche tous les coups possibles ‡ partir des pions du joueur actif
+	// POUR LE JOUEUR ACTIF
 	public ArrayList<Position> findAvailableMoves()
 		{
 		ArrayList<Position> playerPieces = findPlayerPieces();
@@ -277,7 +291,7 @@ public class Board
 		for(Position move:playerPieces)
 			{
 			// Recherche coups possibles
-			for(Position move1:rechercheCoupsPossibles(move))
+			for(Position move1:findAvailableMoves(move))
 				{
 				if (!operatorsAvailable.contains(move1))
 					{
@@ -285,10 +299,11 @@ public class Board
 					}
 				}
 			}
-		//coupsPossibles = new ArrayList<Position>(operatorsAvailable);
 		return operatorsAvailable;
 		}
 
+
+	// Met ‡ jour la stabilitÈ d'un pion dont la position est passÈe en paramËtre
 	public void updateStability(Position pos)
 		{
 		if (pos != null)
@@ -296,7 +311,8 @@ public class Board
 			int posI = pos.i;
 			int posJ = pos.j;
 
-			int stable[] = new int[4];
+			// Tableau pour stocker le rÈsultat de tous les test
+			boolean stable[] = new boolean[4];
 
 			// Si le coup est déÈj‡à stable, on ne fait rien
 			if (stableGrid[pos.i][pos.j] == K_EMPTY)
@@ -316,7 +332,7 @@ public class Board
 					}
 				else
 					{
-					/******* HORIZONTAL ********/
+					/******* PARCOURS HORIZONTAL ********/
 					int cpt = 0;
 					// Parcours droit
 					while(posI + cpt <= 7 && grid[posI + cpt][posJ] == activePlayer)
@@ -326,7 +342,7 @@ public class Board
 
 					if (posI + cpt >= 8)
 						{
-						stable[0] = 1;
+						stable[0] = true;
 						}
 					else
 						{
@@ -341,7 +357,7 @@ public class Board
 						if (posI + cpt < 0)
 							{
 							// PION DEFINITIF sur l'horizontal
-							stable[0] = 1;
+							stable[0] = true;
 							}
 						else
 							{
@@ -354,7 +370,7 @@ public class Board
 
 							if (cpt >= 8)
 								{
-								stable[0] = 1;
+								stable[0] = true;
 								}
 							else
 								{
@@ -363,7 +379,7 @@ public class Board
 							}
 						}
 
-					/********* VERTICAL **********/
+					/********* PARCOURS VERTICAL **********/
 					cpt = 0;
 					// Parcours droit
 					while(posJ + cpt <= 7 && grid[posI][posJ + cpt] == activePlayer)
@@ -373,7 +389,7 @@ public class Board
 						}
 					if (posJ + cpt >= 8)
 						{
-						stable[1] = 1;
+						stable[1] = true;
 						}
 					else
 						{
@@ -388,7 +404,7 @@ public class Board
 						if (posJ + cpt < 0)
 							{
 							// PION DEFINITIF sur l'horizontal
-							stable[1] = 1;
+							stable[1] = true;
 							}
 						else
 							{
@@ -401,7 +417,7 @@ public class Board
 
 							if (cpt >= 8)
 								{
-								stable[1] = 1;
+								stable[1] = true;
 								}
 							else
 								{
@@ -410,7 +426,7 @@ public class Board
 							}
 						}
 
-					/********* DIAGO BAS **********/
+					/********* PARCOURS DIAGO BAS **********/
 					cpt = 0;
 					// Parcours droit
 					while(posI + cpt <= 7 && posJ + cpt <= 7 && grid[posI + cpt][posJ + cpt] == activePlayer)
@@ -420,7 +436,7 @@ public class Board
 
 					if (posI + cpt >= 8 || posJ + cpt >= 8)
 						{
-						stable[2] = 1;
+						stable[2] = true;
 						}
 					else
 						{
@@ -434,7 +450,7 @@ public class Board
 						if (posI + cpt < 0 || posJ + cpt < 0)
 							{
 							// PION DEFINITIF sur la diagonale
-							stable[2] = 1;
+							stable[2] = true;
 							}
 						else
 							{
@@ -454,7 +470,7 @@ public class Board
 
 								if (posI + cpt >= 8 || posJ + cpt >= 8)
 									{
-									stable[2] = 1;
+									stable[2] = true;
 									}
 								else
 									{
@@ -469,7 +485,7 @@ public class Board
 
 						}
 
-					/********* DIAGO HAUT **********/
+					/********* PARCOURS DIAGO HAUT **********/
 					cpt = 0;
 					// Parcours droit
 					while(posI + cpt <= 7 && posJ - cpt >= 0 && grid[posI + cpt][posJ - cpt] == activePlayer)
@@ -479,7 +495,7 @@ public class Board
 
 					if (posI + cpt >= 8 || posJ - cpt < 0)
 						{
-						stable[3] = 1;
+						stable[3] = true;
 						}
 					else
 						{
@@ -493,7 +509,7 @@ public class Board
 						if (posI + cpt < 0 || posJ - cpt >= 8)
 							{
 							// PION DEFINITIF sur l'horizontal
-							stable[3] = 1;
+							stable[3] = true;
 							}
 						else
 							{
@@ -513,7 +529,7 @@ public class Board
 
 								if (posI + cpt >= 8 || posJ - cpt < 0)
 									{
-									stable[3] = 1;
+									stable[3] = true;
 									}
 								else
 									{
@@ -527,7 +543,8 @@ public class Board
 							}
 						}
 
-					if (stable[0] == 1 && stable[1] == 1 && stable[2] == 1 && stable[3] == 1)
+					// Si tous les tests ont passÈs, on rend la case stable
+					if (stable[0] && stable[1] && stable[2] && stable[3])
 						{
 						if (activePlayer == owner)
 							{
@@ -543,6 +560,8 @@ public class Board
 			}
 		}
 
+
+	// Affichage du plateau de jeu normal
 	public void displayBoard()
 		{
 		for(int j = 0; j < 8; j++)
@@ -563,6 +582,8 @@ public class Board
 		System.out.println();
 		}
 
+
+	// Affichage du plateau de jeu de rÈpartition des points
 	public void displayPointsGrid()
 		{
 		for(int j = 0; j < 8; j++)
@@ -583,6 +604,8 @@ public class Board
 		System.out.println();
 		}
 
+
+	// Affichage du plateau de jeu donnant les cases stables
 	public void displayStableGrid()
 		{
 		for(int j = 0; j < 8; j++)
@@ -603,47 +626,25 @@ public class Board
 		System.out.println();
 		}
 
-	// IMPORTANT METHODS
+
+	// Applique le coup fourni en paramËtre et renvoie le plateau rÈsultant
 	public Board applyOp(Position move)
 		{
-		// return a new board with the move applied
+		// Met ‡ jour le nombre de coups jouÈs
 		movesPlayed++;
-
-		/*if (move != null)
-			{
-			if (move.i == 0 && move.j == 0)
-				{
-				pointsGrid[0][1] = 200;
-				pointsGrid[1][0] = 200;
-				}
-
-			if (move.i == 7 && move.j == 0)
-				{
-				pointsGrid[6][0] = 200;
-				pointsGrid[7][1] = 200;
-				}
-
-			if (move.i == 0 && move.j == 7)
-				{
-				pointsGrid[0][6] = 200;
-				pointsGrid[1][7] = 200;
-				}
-
-			if (move.i == 7 && move.j == 7)
-				{
-				pointsGrid[6][7] = 200;
-				pointsGrid[7][6] = 200;
-				}
-			}*/
 
 		return new Board(this, move);
 		}
 
+
+	// DÈtermine si le plateau est jouable ou non
 	public boolean isFinal()
 		{
 		return (this.findAvailableMoves().isEmpty() || this.emptyCaseNb() == 0);
 		}
 
+
+	// Evalue la stabilitÈ du plateau de jeu
 	public int evalStability()
 		{
 		int val = 0;
@@ -673,26 +674,19 @@ public class Board
 		return val;
 		}
 
+
+	// Evalue l'Ètat d'un plateau de jeu
 	public int evalBoard()
 		{
-		// RECHERCHE DES PIONS DEFINITIFS
-		// Pour chaque pions sur le plateau
-		/*ArrayList<Position> coupsPossibles = findPlayerPieces();
-		if (movesPlayed > 0 && coupsPossibles != null)
-			{
-			for(Position pos:coupsPossibles)
-				{
-				updateStability(pos);
-				}
-			}*/
-
+		// DÈfinition des coefficients pour les diffÈrents critËres
 		int coefMobility = 0;
 		int coefPosition = 0;
 		int coefMaterial = 0;
 		int coefStability = 0;
+
 		int adversaire = 1 - owner;
 
-		// Variation des coeff au long de la partie:
+		// Variation des coefficients au long de la partie:
 		// Debut de jeu
 		if (bluePiecesNb + redPiecesNb <= 15)
 			{
@@ -716,20 +710,22 @@ public class Board
 			coefMaterial = 10;
 			}
 
-		// On augmente la stabilitÈ ‡ partir du moment o˘ on
-		if (grid[0][0] == owner || grid[0][7] == owner || grid[7][0] == owner || grid[7][7] == owner)
-			{
-			coefStability = 100;
-			}
-		coefStability=10000;//coefPosition = 10000;
+		// On augmente la stabilitÈ ‡ partir du moment o˘ on a les coins
+		//if (grid[0][0] == owner || grid[0][7] == owner || grid[7][0] == owner || grid[7][7] == owner)
+		//	{
+		//	coefStability = 100;
+		//	}
 
-		// Mobility = nbre de coups dispo
+		// POUR DES RAISONS DE PERFORMANCE, NOUS AVONS CHOISI DE PRENDRE UN COEFFICIENT DE STABILITE FIXE
+		coefStability=1000;
+
+		// Initialisation des Èvaluations des diffÈrents critËres
 		scoreMobility = this.findOwnerAvailableMoves().size();
 		scoreMaterial = 0;
 		scorePosition = 0;
 		scoreStability = evalStability();
 
-		// Vérification des coins et leurs voisins
+		// MISE A JOUR DE LA GRILLE DES POINTS (VÈérification des coins et leurs voisins)
 		if (grid[0][0] == owner)
 			{
 			pointsGrid[0][1] = 200;
@@ -778,7 +774,7 @@ public class Board
 			pointsGrid[7][6] = -200;
 			}
 
-		//Calcul du scorePosition et scoreMaterial
+		// Calcul du scorePosition et scoreMaterial
 		for(int i = 0; i < 8; i++)
 			{
 			for(int j = 0; j < 8; j++)
@@ -840,6 +836,8 @@ public class Board
 		initPointsGrid();
 		}
 
+
+	// Initialisation de la grille des points
 	private void initPointsGrid()
 		{
 		//4 cases centre
@@ -914,14 +912,6 @@ public class Board
 		this.pointsGrid[4][5] = 2;
 		}
 
-	/*------------------------------*\
-	|*				Set				*|
-	\*------------------------------*/
-
-	/*------------------------------*\
-	|*				Get				*|
-	\*------------------------------*/
-
 	/*------------------------------------------------------------------*\
 	|*							Attributs Private						*|
 	\*------------------------------------------------------------------*/
@@ -932,17 +922,15 @@ public class Board
 	private int activePlayer;
 	private int bluePiecesNb;
 	private int redPiecesNb;
-	public int movesPlayed;
-	//private int eval;
 
 	public int scoreMobility;
 	public int scoreMaterial;
 	public int scorePosition;
 	public int scoreStability;
+	public int movesPlayed;
 	public int owner;
 
 	private static final int K_EMPTY = -1;
-	//	private static final int K_STABLE = 0;
 	private static final int K_RED = 0;
 	private static final int K_BLUE = 1;
 	}

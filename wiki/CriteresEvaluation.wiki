@@ -20,19 +20,19 @@ Nous distinguons 3 phases de jeu :
 
 Nous avons les coefficients suivants pour les différentes phases de jeu:
 Durant la première phase:
-  * position = 200
-  * mobilité = 1000
-  * matériel = 1
+  * position = important
+  * mobilité = très important
+  * matériel = très faible
 
 Durant la seconde phase:
-  * position = 100
-  * mobilité = 300
-  * matériel = 30
+  * position = important
+  * mobilité = très important
+  * matériel = moyen
 
 Durant la troisième phase:
-  * position = 5
-  * mobilité = 0
-  * matériel = 10
+  * position = très faible
+  * mobilité = nul
+  * matériel = faible
 
 Le coefficient de stabilité devrait normalement évolué à partir du moment où le joueur possède un coin. Cependant, nous avons remarqué que ceci n'était pas très efficace. 
 Nous avons donc finalement choisi d'utiliser un coefficient fixe pour la stabilité.

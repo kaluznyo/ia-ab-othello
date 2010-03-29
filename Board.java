@@ -688,26 +688,26 @@ public class Board
 
 		// Variation des coefficients au long de la partie:
 		// Debut de jeu
-		if (bluePiecesNb + redPiecesNb <= 15)
+		if (bluePiecesNb + redPiecesNb <= 35)
 			{
-			coefMobility = 10;
-			coefPosition = 10;
+			coefMobility = 1000;
+			coefPosition = 300;
 			coefMaterial = 1;
 
 			}
 		// Milieu de jeu
-		else if (bluePiecesNb + redPiecesNb <= 35)
+		else if (bluePiecesNb + redPiecesNb <= 55)
 			{
-			coefMobility = 3;
-			coefPosition = 10;
+			coefMobility = 300;
+			coefPosition = 120;
 			coefMaterial = 3;
 			}
 		// Fin de jeu
 		else
 			{
 			coefMobility = 0;
-			coefPosition = 5;
-			coefMaterial = 10;
+			coefPosition = 7;
+			coefMaterial = 100;
 			}
 
 		// On augmente la stabilité à partir du moment où on a les coins
@@ -717,7 +717,7 @@ public class Board
 		//	}
 
 		// POUR DES RAISONS DE PERFORMANCE, NOUS AVONS CHOISI DE PRENDRE UN COEFFICIENT DE STABILITE FIXE
-		coefStability=1000;
+		coefStability = 1000;
 
 		// Initialisation des évaluations des différents critères
 		scoreMobility = this.findOwnerAvailableMoves().size();
